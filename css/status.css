@@ -1,0 +1,7 @@
+.iconplus{
+    font-size: 1.5rem !important;
+}
+
+.alertat{
+    margin-left: calc((var(--larguraboxtituloalerta) ) / 2 - (var(--larguratituloalerta) / 2));
+}
