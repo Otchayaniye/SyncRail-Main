@@ -12,9 +12,11 @@ CREATE TABLE usuario(
 
 CREATE TABLE alertas(
     pk_alerta INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    fk_user INT,
+    fk_user_id INT Not NULL,
+    fk_user_name VARCHAR(90),
+    fk_user_mail VARCHAR(100),
     alerta_texto VARCHAR(255),
     alerta_data DATETIME DEFAULT CURRENT_TIMESTAMP,
     alerta_titulo VARCHAR(100),
-    FOREIGN KEY (fk_user) REFERENCES usuario(pk_user)
+    FOREIGN KEY (fk_user_id) REFERENCES usuario(pk_user)
 )
