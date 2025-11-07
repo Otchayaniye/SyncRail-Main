@@ -11,9 +11,9 @@
     position: fixed;
     top: 50%;
     left: 50%;
+    padding: 20px;
     transform: translate(-50%, -50%);
     background-color: white;
-    padding: 20px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     z-index: 10;
   }
@@ -27,4 +27,8 @@
     height: 100%;
     background-color: rgba(0,0,0,0.5);
     z-index: 5;
+  }
+
+  .btf{
+    padding: 6px 0 !important;
   }

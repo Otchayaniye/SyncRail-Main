@@ -2,31 +2,30 @@
 session_start();
 include_once("../connections/db.php");
 include("../lay/menu.php");
-
 if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
+    session_start();
+    session_unset();
+    session_destroy();
     header("Location: ../index.php");
-    exit;
 }
-$error = "";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $user = $_SESSION["pk_user"];
-    $stmt = $conn->prepare("SELECT user_name, user_mail FROM usuario WHERE pk_user = ?");
-    $stmt->bind_param("s", $user);
+// Verificar se o usuário ainda existe no banco
+if (isset($_SESSION["user_id"])) {
+    $stmt = $conn->prepare("SELECT pk_user FROM usuario WHERE pk_user = ?");
+    $stmt->bind_param("i", $_SESSION["user_id"]);
     $stmt->execute();
     $resultado = $stmt->get_result();
-    $alerta_titulo = $_POST["alerta_titulo"];
-    $descr = ($_POST["descr"]);
-    
-    $stmt = $conn->prepare("INSERT INTO alertas(alerta_titulo, alerta_texto, fk_user_id, fk_user_name, fk_user_mail) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $alerta_titulo, $descr, $user, $, $);
-    if ($stmt->execute()) {
+    if ($resultado->num_rows === 0) {
+        // Usuário não existe mais, destruir sessão
+        session_unset();
+        session_destroy();
+        setcookie(session_name(), '', time() - 3600, '/GabrielaPimentel/SyncRail-Main/');
         header("Location: ../index.php");
         exit;
-    } else {
-        $error = "Erro ao criar novo alerta. Por favor, tente novamente.";
     }
 }
+
+$error = "";
 ?>
 
 <!DOCTYPE html>
@@ -45,42 +44,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <body class="backgroundf min-vh-100 d-flex flex-column justify-content-center">
     <div class="container d-flex justify-content-evenly align-items-stretch bgcont rounded p-4">
-        <div class="p-3 lbox w-50 scrolly">yht</div>
-        <div class="p-4 rbox w-50 d-flex flex-column align-items-center bg-success rounded" ">
+        <div class="p-3 lbox w-75 scrolly">yht</div>
+        <div class="p-4 rbox w-25 d-flex flex-column align-items-center bg-success rounded" ">
             <div class=" d-flex w-100 justify-content-between mb-3" id="boxtituloalerta">
             <h3 class="alertat" id="tituloAlerta">Alertas</h3>
+
             <button class="btn p-0 iconplus ps-3 pe-3" onclick="abrirPopup()"><i class="bi bi-plus-circle"></i></button>
+
             <div id="meuPopup" class="popup rounded">
-                <div class="w-100 d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="m-0 p-0">Novo Aviso</h2>
-                    <button class="btn" onclick="fecharPopup()">Fechar</button>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="m-0 p-0">Novo Aviso</h3>
+                    <button class="btn btf" onclick="fecharPopup()"><i class="bi bi-x-lg"></i></button>
                 </div>
-                <form method="POST" action="">
+
+                <form method="POST" action="../connections/createwarning.php" class="d-flex flex-column align-items-center gap-2">
                     <input type="text" id="titulo" name="alerta_titulo" placeholder="Título" class="form-control fontc text-center" autocomplete="off" required>
                     <input type="text" id="descr" name="descr" placeholder="Descrição" class="form-control fontc text-center" autocomplete="off" required>
-                    <button type="submit" class="btf">Enviar</button>
-                    <?php if ($error): ?>
-                        <div class="error w-75"><?= htmlspecialchars($error) ?></div>
-                    <?php endif; ?>
+                    <button type="submit" class="btn border bg-danger w-50 mt-2">Enviar</button>
+                </form>
+                <?php if ($error): ?>
+                    <div class="error w-100 text-center"><?= htmlspecialchars($error) ?></div>
+                <?php endif; ?>
             </div>
             <div id="meuOverlay" class="overlay"></div>
+
         </div>
-        <div class="w-100 p-4 d-flex flex-column align-items-center g-1 alertacorpo scrolly h-100 bg-danger rounded">
-            <div class="">
-                <?php
-                include("../connections/warndisplay.php");
-                if (!empty($alerta)) {
-                    foreach ($alerta as $linha) {
-                        echo '<tr>
+        <div class="w-100 p-2 d-flex flex-column gap-2 alertacorpo scrolly h-100 bg-danger rounded">
+
+            <?php
+            include("../connections/warndisplay.php");
+            if (!empty($alerta)) {
+                foreach ($alerta as $linha) {
+                    echo '<div class="p-2 rounded bg-light"><tr>
                             <td><strong>' . htmlspecialchars($linha['alerta_titulo']) . '</strong></td><br>
-                            <td>' . htmlspecialchars($linha['alerta_texto']) . '</td><br>
-                            <td><em>' . htmlspecialchars($linha['alerta_data']) . '</em></td><br>
-                            <td>' . htmlspecialchars($linha['user_name']) . '</em></td><br> 
-                        </tr>';
-                    }
+                            <td>' . htmlspecialchars($linha['fk_user_name']) . '</em></td><br> 
+                            <div class="w-100 text-end fs-6"><td><em>' . htmlspecialchars($linha['alerta_data']) . '</em></td><br></div>
+                        </tr></div>';
                 }
-                ?>
-            </div>
+            }
+            ?>
+
         </div>
 
     </div>

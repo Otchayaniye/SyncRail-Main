@@ -17,6 +17,5 @@ CREATE TABLE alertas(
     fk_user_mail VARCHAR(100),
     alerta_texto VARCHAR(255),
     alerta_data DATETIME DEFAULT CURRENT_TIMESTAMP,
-    alerta_titulo VARCHAR(100),
-    FOREIGN KEY (fk_user_id) REFERENCES usuario(pk_user)
+    alerta_titulo VARCHAR(100)
 )
