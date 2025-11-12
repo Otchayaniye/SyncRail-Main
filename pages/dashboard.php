@@ -1,33 +1,14 @@
+
 <?php
-session_start();
-include_once("../connections/db.php");
 include("../lay/menu.php");
-if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
-    session_start();
-    session_unset();
-    session_destroy();
-    header("Location: ../index.php");
-}
-
-// Verificar se o usuário ainda existe no banco
-if (isset($_SESSION["user_id"])) {
-    $stmt = $conn->prepare("SELECT pk_user FROM usuario WHERE pk_user = ?");
-    $stmt->bind_param("i", $_SESSION["user_id"]);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
-    if ($resultado->num_rows === 0) {
-        // Usuário não existe mais, destruir sessão
-        session_unset();
-        session_destroy();
-        setcookie(session_name(), '', time() - 3600, '/GabrielaPimentel/SyncRail-Main/');
-        header("Location: ../index.php");
-        exit;
-    }
-}
-
+session_start();
 $error = "";
-?>
 
+if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
+    header("Location: ../index.php");
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -39,7 +20,7 @@ $error = "";
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <title>Status</title>
+    <title>Dashboard</title>
 </head>
 
 <body class="backgroundf min-vh-100 d-flex flex-column justify-content-center">
