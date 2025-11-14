@@ -1,10 +1,10 @@
 <?php
 session_start();
-$erro = "";
+$error = "";
 
-if (isset($_SESSION['erro'])) {
-    $erro = $_SESSION['erro'] ?? '';
-    unset($_SESSION['erro']);
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'] ?? '';
+    unset($_SESSION['error']);
 }
 
 if (isset($_SESSION["user_name"]) && isset($_SESSION["conected"])) {
@@ -38,7 +38,7 @@ if (isset($_SESSION["user_name"]) && isset($_SESSION["conected"])) {
                     <input type="password" id="password" name="password" placeholder="Senha" class="form-control fontc text-center" required>
                     <a class="link" href="pages/register_user.php">Criar conta</a>
                     <button type="submit" name="login" class="btf">Entrar</button>
-                    <?php if ($erro): ?>
+                    <?php if ($error): ?>
                         <div class="error"><?= htmlspecialchars($error) ?></div>
                     <?php endif; ?>
                 </div>

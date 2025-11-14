@@ -1,4 +1,4 @@
-<?php 
+<?php
 require "db.php";
 
 session_start();
@@ -22,7 +22,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $stmt = $conn->prepare("INSERT INTO usuario(user_name, user_mail, user_password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $username, $email, $password);
             if ($stmt->execute()) {
-                header("Location: ../index.php");
+                $_SESSION["user_name"] = $dados["user_name"];
+                $_SESSION["user_id"] = $dados["pk_user"];
+                $_SESSION["conected"] = true;
+                header("Location: ../pages/dashboard.php");
                 exit;
             } else {
                 $error = "Erro ao cadastrar usuário.";
@@ -32,4 +35,3 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "A senha deve conter entre 6 e 26 caracteres alfabéticos.";
     }
 }
-?>

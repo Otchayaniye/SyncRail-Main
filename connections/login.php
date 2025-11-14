@@ -25,10 +25,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: ../pages/dashboard.php");
             exit;
         } else {
-            $error = "E-mail ou senha inválidos.";
+            $_SESSION['error'] = "E-mail ou senha inválidos.";
         }
     } else {
-        $error = "E-mail ou senha inválidos.";
+        $_SESSION['error'] = "E-mail ou senha inválidos.";
     }
 }
-?>

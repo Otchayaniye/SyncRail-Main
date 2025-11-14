@@ -2,11 +2,6 @@
 session_start();
 require_once('db.php');
 
-if (!isset($_SESSION["user_id"])) {
-    header("Location: ../index.php");
-    exit;
-}
-
 $stmt = $conn->prepare("SELECT user_name, user_mail FROM usuario WHERE pk_user = ?");
 $stmt->bind_param("i", $_SESSION["user_id"]);
 $stmt->execute();
@@ -26,10 +21,9 @@ if ($resultado->num_rows === 1) {
         header("Location: ../pages/dashboard.php");
         exit;
     } else {
-        echo "Erro ao inserir: " . $stmt->error;
-        // Opcional: redirecionar mesmo em erro para evitar ficar na página de erro
-        // header("Location: ../pages/dashboard.php?error=insert");
-        // exit;
+        $_SESSION['error'] = "Erro ao inserir: " . $stmt->error;
+        header("Location: ../pages/dashboard.php");
+        exit;
     }
 } else {
     echo "Usuário não encontrado.";
