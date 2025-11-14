@@ -1,11 +1,8 @@
 <?php
 require_once('db.php');
 
-session_start();
-
-session_unset();
-
-session_destroy();
+$_SESSION["user_name"] = "";
+$_SESSION["user_id"] = "";
+$_SESSION["conected"] = false;
 
 header("Location: ../index.php");
-?>
