@@ -26,8 +26,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         } else {
             $_SESSION['error'] = "E-mail ou senha inválidos.";
+            header("Location: ../index.php");
         }
     } else {
         $_SESSION['error'] = "E-mail ou senha inválidos.";
+        header("Location: ../index.php");
     }
 }
