@@ -1,4 +1,3 @@
-
 <?php
 include("../lay/menu.php");
 session_start();
@@ -8,6 +7,7 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
     header("Location: ../index.php");
     exit;
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -30,12 +30,12 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
             <div class=" d-flex w-100 justify-content-between mb-3" id="boxtituloalerta">
             <h3 class="alertat" id="tituloAlerta">Alertas</h3>
 
-            <button class="btn p-0 iconplus ps-3 pe-3" onclick="abrirPopup()"><i class="bi bi-plus-circle"></i></button>
+            <button class="btn p-0 iconplus ps-3 pe-3" onclick="abrircriaralerta()"><i class="bi bi-plus-circle"></i></button>
 
-            <div id="meuPopup" class="popup rounded">
+            <div id="popcriaralerta" class="popup rounded">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h3 class="m-0 p-0">Novo Aviso</h3>
-                    <button class="btn btf" onclick="fecharPopup()"><i class="bi bi-x-lg"></i></button>
+                    <button class="btn btf" onclick="fecharcriaralerta()"><i class="bi bi-x-lg"></i></button>
                 </div>
 
                 <form method="POST" action="../connections/createwarning.php" class="d-flex flex-column align-items-center gap-2">
@@ -47,7 +47,7 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
                     <div class="error w-100 text-center"><?= htmlspecialchars($error) ?></div>
                 <?php endif; ?>
             </div>
-            <div id="meuOverlay" class="overlay"></div>
+            <div id="criaralertaoverlay" class="overlay"></div>
 
         </div>
         <div class="w-100 p-2 d-flex flex-column gap-2 alertacorpo scrolly h-100 bg-danger rounded">
@@ -56,16 +56,32 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
             include("../connections/warndisplay.php");
             if (!empty($alerta)) {
                 foreach ($alerta as $linha) {
-                    echo '<div class="p-2 rounded bg-light"><tr>
+                    echo '<a onclick="abrirveralerta(), idalerta()" class="linkveralerta p-2 rounded bg-light" id="' . htmlspecialchars($linha['pk_alerta']) . '"><tr>
                             <td><strong>' . htmlspecialchars($linha['alerta_titulo']) . '</strong></td><br>
                             <td>' . htmlspecialchars($linha['fk_user_name']) . '</em></td><br> 
                             <div class="w-100 text-end fs-6"><td><em>' . htmlspecialchars($linha['alerta_data']) . '</em></td><br></div>
-                        </tr></div>';
+                        </tr></a>';
                 }
             }
             ?>
-
         </div>
+
+        <div class="popupveralerta rounded" id="popmostraralerta">
+            <?php
+            include("../connections/showwarndisplay.php");
+            echo '<div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="m-0 p-0">' . htmlspecialchars($alertacompleto['alerta_titulo']) . '</h3>
+                        <button class="btn btf" onclick="fecharveralerta()"><i class="bi bi-x-lg"></i></button>
+                        </div> <div class="alertacorpo scrolly">
+                        <p>' . nl2br(htmlspecialchars($alertacompleto['alerta_texto'])) . '</p>
+                        <div class="w-100 text-end fs-6"><em>Criado por ' . htmlspecialchars($alertacompleto['fk_user_name']) . ' em '
+                . htmlspecialchars($alertacompleto['alerta_data']) . '</em></div>
+                        </div>';
+
+            ?>
+        </div>
+        <div id="mostraralertaoverlay" class="overlayveralerta"></div>
+
 
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -79,15 +95,42 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
         elementotituloalerta.style.setProperty('--larguratituloalerta', larguratituloalerta + 'px');
         elementotituloalerta.style.setProperty('--larguraboxtituloalerta', larguraboxtituloalerta + 'px');
 
-        function abrirPopup() {
-            document.getElementById("meuPopup").style.display = "block";
-            document.getElementById("meuOverlay").style.display = "block";
+        function abrircriaralerta() {
+            document.getElementById("popcriaralerta").style.display = "block";
+            document.getElementById("criaralertaoverlay").style.display = "block";
         }
 
         // Função para fechar o pop-up e a sobreposição
-        function fecharPopup() {
-            document.getElementById("meuPopup").style.display = "none";
-            document.getElementById("meuOverlay").style.display = "none";
+        function fecharcriaralerta() {
+            document.getElementById("popcriaralerta").style.display = "none";
+            document.getElementById("criaralertaoverlay").style.display = "none";
+        }
+
+        function idalerta() {
+            const alertaIDstring = event.target.id;
+            const alertaID = parseInt(alertaIDstring, 10);
+            console.log("ID do alerta selecionado: " + alertaID);
+            $.ajax({
+                type: 'POST',
+                url: '../connections/showwarndisplay.php', // O arquivo PHP que irá receber os dados
+                data: { alertaId: alertaID },
+                success: function(retorno) {
+                    // Opcional: lidar com a resposta do PHP aqui
+                    console.log("PHP recebeu: " + retorno);
+                }
+            });
+        }
+
+        function abrirveralerta() {
+            document.getElementById("popmostraralerta").style.display = "block";
+            document.getElementById("mostraralertaoverlay").style.display = "block";
+            console.log("Abrindo alerta");
+        }
+
+        // Função para fechar o pop-up e a sobreposição
+        function fecharveralerta() {
+            document.getElementById("popmostraralerta").style.display = "none";
+            document.getElementById("mostraralertaoverlay").style.display = "none";
         }
     </script>
 </body>

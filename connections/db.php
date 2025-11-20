@@ -4,7 +4,7 @@
 
 $host     = "localhost";
 $usuario  = "root";
-$senha    = "root";
+$senha    = "";
 $banco    = "tsf";
 
 // Cria a conexão

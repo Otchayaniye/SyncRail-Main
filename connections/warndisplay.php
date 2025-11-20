@@ -8,6 +8,6 @@ if ($resultado && $resultado->num_rows >= 1) {
 } else {
     echo "<div class='w-100 p-3 text-center'> Não há alertas! </div>";
 }
+
 $resultado->free();
-$conn->close();
 ?>
