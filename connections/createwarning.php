@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once('db.php');
-
 $stmt = $conn->prepare("SELECT user_name, user_mail FROM usuario WHERE pk_user = ?");
 $stmt->bind_param("i", $_SESSION["user_id"]);
 $stmt->execute();

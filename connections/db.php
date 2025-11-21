@@ -8,7 +8,7 @@ $senha    = "";
 $banco    = "tsf";
 
 // Cria a conexão
-$conn = new mysqli($host, $usuario, $senha, $banco);
+$conn = new mysqli($host, $usuario, $senha, $banco );
 
 // Verifica erro de conexão
 if ($conn->connect_error) {
@@ -16,6 +16,14 @@ if ($conn->connect_error) {
 }
 
 $stmt=$conn->prepare("ALTER TABLE usuario AUTO_INCREMENT = 1");
+$stmt->execute();
+$stmt=$conn->prepare("ALTER TABLE alertas AUTO_INCREMENT = 1");
+$stmt->execute();
+$stmt=$conn->prepare("ALTER TABLE estacoes AUTO_INCREMENT = 1");
+$stmt->execute();
+$stmt=$conn->prepare("ALTER TABLE rotas AUTO_INCREMENT = 1");
+$stmt->execute();
+$stmt=$conn->prepare("ALTER TABLE rota_estacoes AUTO_INCREMENT = 1");
 $stmt->execute();
 
 // Força charset utf8 para acentuação

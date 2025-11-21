@@ -1,5 +1,5 @@
 .bgform{
-    background-color: #FAF9F8;
+    background-color: var(--bg1);
 }
 
 .fontc{
@@ -7,7 +7,7 @@
 }
 
 .btf{
-    background-color: #B0B199;
+    background-color: var(--bg3);
     color: #14100E;
     border: none;
     width: 90%;
@@ -16,11 +16,11 @@
 }
 
 .link{
-    color: #727D85;
+    color: var(--bg4);
     
 }
 .link:hover{
-    color: #5A565E;
+    color: var(--bg5);
 }
 
 input:focus::placeholder{
@@ -33,7 +33,7 @@ input:focus::placeholder{
 
 .fontc:focus{
     box-shadow: 0 0 0 .25rem rgba(176, 177, 153, .69) !important;
-    border-color: #B0B199 !important;
+    border-color: var(--bg3) !important;
 }
 
 input::placeholder{
@@ -43,4 +43,10 @@ input::placeholder{
 body{
     margin: 0;
     padding: 0;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
 }
