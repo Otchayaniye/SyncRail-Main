@@ -309,55 +309,55 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
 
         // Renderizar rotas no mapa
         // Função renderRoutes - CORRIGIDA
-function renderRoutes() {
-    // Limpar rotas existentes
-    routeLines.forEach(line => {
-        if (line && map.hasLayer(line)) {
-            map.removeLayer(line);
-        }
-    });
-    routeLines = [];
+        function renderRoutes() {
+            // Limpar rotas existentes
+            routeLines.forEach(line => {
+                if (line && map.hasLayer(line)) {
+                    map.removeLayer(line);
+                }
+            });
+            routeLines = [];
 
-    // Limpar lista de rotas
-    const container = document.getElementById('routes-container');
-    container.innerHTML = '';
+            // Limpar lista de rotas
+            const container = document.getElementById('routes-container');
+            container.innerHTML = '';
 
-    // Adicionar cada rota
-    routes.forEach(route => {
-        // Verificar se a rota tem estações
-        if (!route.estacoes || route.estacoes.length === 0) {
-            console.warn(`Rota "${route.nome}" não tem estações`);
-            return;
-        }
+            // Adicionar cada rota
+            routes.forEach(route => {
+                // Verificar se a rota tem estações
+                if (!route.estacoes || route.estacoes.length === 0) {
+                    console.warn(`Rota "${route.nome}" não tem estações`);
+                    return;
+                }
 
-        // Obter coordenadas das estações da rota
-        const coordinates = route.estacoes.map(estacao => {
-            // Garantir que as coordenadas são números
-            const lat = parseFloat(estacao.latitude);
-            const lng = parseFloat(estacao.longitude);
-            return [lat, lng];
-        });
+                // Obter coordenadas das estações da rota
+                const coordinates = route.estacoes.map(estacao => {
+                    // Garantir que as coordenadas são números
+                    const lat = parseFloat(estacao.latitude);
+                    const lng = parseFloat(estacao.longitude);
+                    return [lat, lng];
+                });
 
-        if (coordinates.length > 1) {
-            try {
-                // Criar linha principal da rota
-                const line = L.polyline(coordinates, {
-                    color: '#e74c3c',
-                    weight: 6,
-                    opacity: 0.8,
-                    lineCap: 'round'
-                }).addTo(map);
+                if (coordinates.length > 1) {
+                    try {
+                        // Criar linha principal da rota
+                        const line = L.polyline(coordinates, {
+                            color: '#e74c3c',
+                            weight: 6,
+                            opacity: 0.8,
+                            lineCap: 'round'
+                        }).addTo(map);
 
-                // Linha de sombra para efeito de trilho
-                const shadowLine = L.polyline(coordinates, {
-                    color: '#2c3e50',
-                    weight: 8,
-                    opacity: 0.3,
-                    lineCap: 'round'
-                }).addTo(map);
+                        // Linha de sombra para efeito de trilho
+                        const shadowLine = L.polyline(coordinates, {
+                            color: '#2c3e50',
+                            weight: 8,
+                            opacity: 0.3,
+                            lineCap: 'round'
+                        }).addTo(map);
 
-                // Adicionar popup com informações
-                const popupContent = `
+                        // Adicionar popup com informações
+                        const popupContent = `
                     <div style="min-width: 200px;">
                         <h3 style="margin: 0 0 10px 0; color: #2c3e50;">${route.nome}</h3>
                         <div style="font-size: 14px; margin-bottom: 5px;">
@@ -375,41 +375,41 @@ function renderRoutes() {
                     </div>
                 `;
 
-                line.bindPopup(popupContent);
-                shadowLine.bindPopup(popupContent);
+                        line.bindPopup(popupContent);
+                        shadowLine.bindPopup(popupContent);
 
-                routeLines.push(line, shadowLine);
+                        routeLines.push(line, shadowLine);
 
-                // Adicionar marcadores para as estações da rota (opcional)
-                route.estacoes.forEach((estacao, index) => {
-                    const marker = L.marker([estacao.latitude, estacao.longitude], {
-                        icon: L.divIcon({
-                            className: 'route-station-marker',
-                            html: `<div style="background-color: #27ae60; color: white; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">${index + 1}</div>`,
-                            iconSize: [24, 24]
-                        })
-                    }).addTo(map);
-                    
-                    marker.bindPopup(`
+                        // Adicionar marcadores para as estações da rota (opcional)
+                        route.estacoes.forEach((estacao, index) => {
+                            const marker = L.marker([estacao.latitude, estacao.longitude], {
+                                icon: L.divIcon({
+                                    className: 'route-station-marker',
+                                    html: `<div style="background-color: #27ae60; color: white; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold;">${index + 1}</div>`,
+                                    iconSize: [24, 24]
+                                })
+                            }).addTo(map);
+
+                            marker.bindPopup(`
                         <div>
                             <h4>${estacao.nome}</h4>
                             <p>Ordem na rota: ${index + 1}</p>
                             <p>${estacao.endereco || 'Sem endereço'}</p>
                         </div>
                     `);
-                    
-                    routeLines.push(marker);
-                });
 
-            } catch (error) {
-                console.error(`Erro ao renderizar rota "${route.nome}":`, error);
-            }
-        }
+                            routeLines.push(marker);
+                        });
 
-        // Adicionar à lista lateral
-        const routeItem = document.createElement('div');
-        routeItem.className = 'route-item';
-        routeItem.innerHTML = `
+                    } catch (error) {
+                        console.error(`Erro ao renderizar rota "${route.nome}":`, error);
+                    }
+                }
+
+                // Adicionar à lista lateral
+                const routeItem = document.createElement('div');
+                routeItem.className = 'route-item';
+                routeItem.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div style="flex: 1;">
                     <strong>${route.nome}</strong>
@@ -425,15 +425,17 @@ function renderRoutes() {
             </div>
         `;
 
-        routeItem.addEventListener('click', function() {
-            if (coordinates.length > 0) {
-                map.fitBounds(coordinates, { padding: [20, 20] });
-            }
-        });
+                routeItem.addEventListener('click', function() {
+                    if (coordinates.length > 0) {
+                        map.fitBounds(coordinates, {
+                            padding: [20, 20]
+                        });
+                    }
+                });
 
-        container.appendChild(routeItem);
-    });
-}
+                container.appendChild(routeItem);
+            });
+        }
         // Alternar modo de edição
         function toggleEditMode() {
             editMode = !editMode;
@@ -791,51 +793,51 @@ function renderRoutes() {
         }
 
         // Excluir rota
-function deleteRoute(routeId) {
-    console.log('Tentando excluir rota ID:', routeId, 'Tipo:', typeof routeId);
-    
-    // Garantir que routeId é um número
-    routeId = parseInt(routeId);
-    
-    if (!routeId || isNaN(routeId)) {
-        alert('ID da rota inválido');
-        return;
-    }
+        function deleteRoute(routeId) {
+            console.log('Tentando excluir rota ID:', routeId, 'Tipo:', typeof routeId);
 
-    // Encontrar a rota para mostrar o nome
-    const route = routes.find(r => parseInt(r.id) === routeId);
-    const routeName = route ? route.nome : `ID ${routeId}`;
+            // Garantir que routeId é um número
+            routeId = parseInt(routeId);
 
-    if (!confirm(`Tem certeza que deseja excluir a rota "${routeName}"?\nEsta ação não pode ser desfeita.`)) {
-        return;
-    }
-
-    const data = {
-        id: routeId
-    };
-
-    fetch('api.php?action=delete_route', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                updateStatus(`Rota "${routeName}" excluída com sucesso`);
-                // Recarregar as rotas
-                loadRoutes();
-            } else {
-                alert('Erro ao excluir rota: ' + data.message);
+            if (!routeId || isNaN(routeId)) {
+                alert('ID da rota inválido');
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao excluir rota: ' + error.message);
-        });
-}
+
+            // Encontrar a rota para mostrar o nome
+            const route = routes.find(r => parseInt(r.id) === routeId);
+            const routeName = route ? route.nome : `ID ${routeId}`;
+
+            if (!confirm(`Tem certeza que deseja excluir a rota "${routeName}"?\nEsta ação não pode ser desfeita.`)) {
+                return;
+            }
+
+            const data = {
+                id: routeId
+            };
+
+            fetch('api.php?action=delete_route', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        updateStatus(`Rota "${routeName}" excluída com sucesso`);
+                        // Recarregar as rotas
+                        loadRoutes();
+                    } else {
+                        alert('Erro ao excluir rota: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao excluir rota: ' + error.message);
+                });
+        }
 
         // Atualizar posição da estação
         function updateStationPosition(stationId, lat, lng) {

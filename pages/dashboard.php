@@ -1,5 +1,6 @@
 <?php
 include("../lay/menu.php");
+require_once('../connections/db.php');
 session_start();
 $error = "";
 
@@ -7,6 +8,14 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
     header("Location: ../index.php");
     exit;
 }
+
+$id = $_SESSION['user_id'];
+$stmt = $conn->prepare("SELECT user_adm FROM usuario WHERE pk_user = ?");
+$stmt -> bind_param("i", $id);
+$stmt -> execute();
+$resultado = $stmt->get_result();
+$admin = $resultado->fetch_assoc();
+$_SESSION['admin'] = $admin['user_adm'];
 
 ?>
 <!DOCTYPE html>
@@ -36,7 +45,7 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
             <div class=" d-flex w-100 justify-content-between mb-3" id="boxtituloalerta">
                 <h3 class="alertat" id="tituloAlerta">Alertas</h3>
 
-                <button class="btn p-0 iconplus ps-3 pe-3" onclick="abrircriaralerta()"><i class="bi bi-plus-circle"></i></button>
+                <button class="btn p-0 iconplus ps-3 pe-3" onclick="abrircriaralerta()" id="adminonly"><i class="bi bi-plus-circle"></i></button>
 
                 <div id="popcriaralerta" class="popup rounded">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -86,6 +95,7 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
                     <div class="w-100 text-end">
                         <strong>Criado por:</strong>
                         <p class="mb-1" id="alertaUser">Carregando usuário...</p>
+                        <p class="mb-1" id="alertaUserEmail">Carregando email...</p>
                     </div>
                     <div class="w-100 text-end fs-6">
                         <em id="alertaInfo">Carregando informações...</em>
@@ -101,6 +111,13 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
             crossorigin="anonymous"></script>
         <script src="../js/dashborad.js"></script>
         <script>
+
+            if (<?php echo $_SESSION['admin'] ?> === 1){
+                document.getElementById("adminonly").style.display = "block";
+            } else if (<?php echo $_SESSION['admin'] ?> != 1){
+                document.getElementById("adminonly").style.display = "none";
+            }
+
             $(document).on('click', '.linkveralerta', function(event) {
                 event.preventDefault();
                 var alertaID = $(this).data('alerta-id');
@@ -119,7 +136,8 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
                             // Preencher o popup com os dados do alerta
                             $('#alertaTitulo').text(response.alerta_titulo);
                             $('#alertaTexto').html(response.alerta_texto.replace(/\n/g, '<br>'));
-                            $('#alertaUser').html(response.fk_user_name + '\n' + response.fk_user_mail);
+                            $('#alertaUser').html(response.fk_user_name);
+                            $('#alertaUserEmail').html(response.fk_user_mail);
                             $('#alertaInfo').html(response.alerta_data);
 
                             // Abrir o popup

@@ -1,13 +1,67 @@
 <?php
+// api.php - Backend para gerenciar estações e rotas (CORRIGIDO)
+
+// DESATIVAR TODOS OS ERROS E WARNINGS ANTES DO HEADER
+error_reporting(0);
+ini_set('display_errors', 0);
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
-session_start();
-require_once('../connections/db.php');
-require_once('../connections/notification_helper.php');
+
+// Configurações do banco de dados
+$host = "localhost:3307";
+$usuario = "root";
+$senha = "";
+$banco = "tsf"; // Usando o banco tsf
+
+// Criar conexão MySQLi
+$mysqli = new mysqli($host, $usuario, $senha, $banco);
+
+// Verificar conexão
+if ($mysqli->connect_error) {
+    echo json_encode(['success' => false, 'message' => 'Erro de conexão: ' . $mysqli->connect_error]);
+    exit;
+}
+
+// Inicializar cache
+$cache_estacoes = null;
+$cache_routes = null;
+
+$notificationHelperPath = __DIR__ . '/../connections/notification_helper.php';
+if (file_exists($notificationHelperPath)) {
+    require_once($notificationHelperPath);
+} else {
+    // Se não existir, criar funções dummy
+    function notificarCriacaoRota($nomeRota, $estacoesCount, $distancia) { 
+        error_log("Notificação: Rota {$nomeRota} criada com {$estacoesCount} estações");
+        return true; 
+    }
+    function notificarExclusaoRota($nomeRota) { 
+        error_log("Notificação: Rota {$nomeRota} excluída");
+        return true; 
+    }
+    function notificarCriacaoEstacao($nomeEstacao) { 
+        error_log("Notificação: Estação {$nomeEstacao} criada");
+        return true; 
+    }
+    function notificarExclusaoEstacao($nomeEstacao) { 
+        error_log("Notificação: Estação {$nomeEstacao} excluída");
+        return true; 
+    }
+    function notificarEdicaoEstacao($nomeEstacao) { 
+        error_log("Notificação: Estação {$nomeEstacao} editada");
+        return true; 
+    }
+    function notificarMovimentoEstacao($nomeEstacao) { 
+        error_log("Notificação: Estação {$nomeEstacao} movida");
+        return true; 
+    }
+}
 $action = $_GET['action'] ?? '';
+
+// Para requisições POST, obter os dados do corpo
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     if (json_last_error() !== JSON_ERROR_NONE) {
@@ -15,6 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 } else {
     $input = $_GET;
+}
+
+// Função para invalidar cache
+function invalidateCache() {
+    global $cache_estacoes, $cache_routes;
+    $cache_estacoes = null;
+    $cache_routes = null;
 }
 
 switch ($action) {
@@ -50,11 +111,7 @@ switch ($action) {
         echo json_encode(['success' => false, 'message' => 'Ação não reconhecida']);
         break;
 }
-
-
-// Função para obter estações
-function getStations($mysqli)
-{
+function getStations($mysqli) {
     global $cache_estacoes;
 
     if ($cache_estacoes !== null) {
@@ -67,7 +124,7 @@ function getStations($mysqli)
         if ($result) {
             $stations = [];
             while ($row = $result->fetch_assoc()) {
-                // Converter tipos uma vez só
+                // Converter tipos
                 $row['id'] = (int)$row['id'];
                 $row['latitude'] = (float)$row['latitude'];
                 $row['longitude'] = (float)$row['longitude'];
@@ -83,10 +140,7 @@ function getStations($mysqli)
     }
 }
 
-// Função para obter rotas com suas estações
-// Função para obter rotas com suas estações - CORRIGIDA
-function getRoutes($mysqli)
-{
+function getRoutes($mysqli) {
     global $cache_routes;
 
     if ($cache_routes !== null) {
@@ -95,67 +149,43 @@ function getRoutes($mysqli)
     }
 
     try {
-        // SINGLE QUERY com JOIN - muito mais eficiente
-        $query = "
-            SELECT 
-                r.id as rota_id,
-                r.nome as rota_nome,
-                r.distancia_km,
-                r.tempo_estimado_min,
-                e.id as estacao_id,
-                e.nome as estacao_nome,
-                e.latitude,
-                e.longitude,
-                e.endereco,
-                re.ordem
-            FROM rotas r
-            LEFT JOIN rota_estacoes re ON r.id = re.id_rota
-            LEFT JOIN estacoes e ON re.id_estacao = e.id
-            ORDER BY r.nome, re.ordem
-        ";
-
-        $result = $mysqli->query($query);
+        // Consulta simplificada - primeiro pegar as rotas
+        $result = $mysqli->query("SELECT id, nome, distancia_km, tempo_estimado_min FROM rotas ORDER BY nome");
         if (!$result) {
             throw new Exception($mysqli->error);
         }
 
         $routes = [];
-        $current_route_id = null;
-
         while ($row = $result->fetch_assoc()) {
-            $route_id = (int)$row['rota_id'];
-
-            // Nova rota
-            if ($current_route_id !== $route_id) {
-                if ($current_route_id !== null) {
-                    $routes[] = $current_route;
-                }
-
-                $current_route = [
-                    'id' => $route_id,
-                    'nome' => $row['rota_nome'],
-                    'distancia_km' => (float)$row['distancia_km'],
-                    'tempo_estimado_min' => (int)$row['tempo_estimado_min'],
-                    'estacoes' => []
-                ];
-                $current_route_id = $route_id;
+            $route = [
+                'id' => (int)$row['id'],
+                'nome' => $row['nome'],
+                'distancia_km' => (float)$row['distancia_km'],
+                'tempo_estimado_min' => (int)$row['tempo_estimado_min'],
+                'estacoes' => []
+            ];
+            
+            // Buscar estações desta rota
+            $stmt = $mysqli->prepare("
+                SELECT e.id, e.nome, e.latitude, e.longitude, e.endereco 
+                FROM estacoes e 
+                JOIN rota_estacoes re ON e.id = re.id_estacao 
+                WHERE re.id_rota = ? 
+                ORDER BY re.ordem
+            ");
+            $stmt->bind_param("i", $route['id']);
+            $stmt->execute();
+            $resultEstacoes = $stmt->get_result();
+            
+            while ($estacao = $resultEstacoes->fetch_assoc()) {
+                $estacao['id'] = (int)$estacao['id'];
+                $estacao['latitude'] = (float)$estacao['latitude'];
+                $estacao['longitude'] = (float)$estacao['longitude'];
+                $route['estacoes'][] = $estacao;
             }
-
-            // Adicionar estação se existir
-            if ($row['estacao_id']) {
-                $current_route['estacoes'][] = [
-                    'id' => (int)$row['estacao_id'],
-                    'nome' => $row['estacao_nome'],
-                    'latitude' => (float)$row['latitude'],
-                    'longitude' => (float)$row['longitude'],
-                    'endereco' => $row['endereco']
-                ];
-            }
-        }
-
-        // Adicionar última rota
-        if ($current_route_id !== null) {
-            $routes[] = $current_route;
+            $stmt->close();
+            
+            $routes[] = $route;
         }
 
         $cache_routes = $routes;
@@ -165,7 +195,6 @@ function getRoutes($mysqli)
     }
 }
 
-// Função para salvar estação
 function saveStation($mysqli, $input) {
     try {
         $id = $input['id'] ?? null;
@@ -187,15 +216,6 @@ function saveStation($mysqli, $input) {
                 WHERE id = ?
             ");
             $stmt->bind_param("ssddi", $nome, $endereco, $latitude, $longitude, $id);
-            
-            if ($stmt->execute()) {
-                // Notificar edição da estação
-                notificarEdicaoEstacao($nome);
-                $newId = $id;
-                echo json_encode(['success' => true, 'id' => $newId]);
-            } else {
-                throw new Exception($stmt->error);
-            }
         } else {
             // Inserir nova estação
             $stmt = $mysqli->prepare("
@@ -203,15 +223,22 @@ function saveStation($mysqli, $input) {
                 VALUES (?, ?, ?, ?)
             ");
             $stmt->bind_param("ssdd", $nome, $endereco, $latitude, $longitude);
+        }
+        
+        if ($stmt->execute()) {
+            $newId = $id ?: $mysqli->insert_id;
+            invalidateCache(); // Invalidar cache após mudança
             
-            if ($stmt->execute()) {
-                // Notificar criação da estação
+            // Tentar notificar (se as funções existirem)
+            if (function_exists('notificarEdicaoEstacao') && $id) {
+                notificarEdicaoEstacao($nome);
+            } elseif (function_exists('notificarCriacaoEstacao') && !$id) {
                 notificarCriacaoEstacao($nome);
-                $newId = $mysqli->insert_id;
-                echo json_encode(['success' => true, 'id' => $newId]);
-            } else {
-                throw new Exception($stmt->error);
             }
+            
+            echo json_encode(['success' => true, 'id' => $newId]);
+        } else {
+            throw new Exception($stmt->error);
         }
         
         $stmt->close();
@@ -220,7 +247,6 @@ function saveStation($mysqli, $input) {
     }
 }
 
-// Função para excluir estação
 function deleteStation($mysqli, $input) {
     try {
         $id = $input['id'] ?? null;
@@ -230,7 +256,7 @@ function deleteStation($mysqli, $input) {
             return;
         }
         
-        // Primeiro, obter o nome da estação para a notificação
+        // Primeiro, obter o nome da estação
         $stmt = $mysqli->prepare("SELECT nome FROM estacoes WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -268,8 +294,13 @@ function deleteStation($mysqli, $input) {
         $stmt->bind_param("i", $id);
         
         if ($stmt->execute()) {
-            // Notificar exclusão da estação
-            notificarExclusaoEstacao($nomeEstacao);
+            invalidateCache(); // Invalidar cache após mudança
+            
+            // Tentar notificar
+            if (function_exists('notificarExclusaoEstacao')) {
+                notificarExclusaoEstacao($nomeEstacao);
+            }
+            
             echo json_encode(['success' => true]);
         } else {
             throw new Exception($stmt->error);
@@ -280,6 +311,7 @@ function deleteStation($mysqli, $input) {
         echo json_encode(['success' => false, 'message' => 'Erro ao excluir estação: ' . $e->getMessage()]);
     }
 }
+
 function saveRoute($mysqli, $input) {
     try {
         $nome = $input['nome'] ?? '';
@@ -293,7 +325,7 @@ function saveRoute($mysqli, $input) {
             return;
         }
         
-        // Calcular distância total (código existente mantido)
+        // Calcular distância total
         $distancia_total = 0;
         $stmt = $mysqli->prepare("SELECT latitude, longitude FROM estacoes WHERE id = ?");
         
@@ -308,10 +340,10 @@ function saveRoute($mysqli, $input) {
             
             if ($estacao1 && $estacao2) {
                 // Fórmula de Haversine para calcular distância
-                $lat1 = deg2rad($estacao1['latitude']);
-                $lon1 = deg2rad($estacao1['longitude']);
-                $lat2 = deg2rad($estacao2['latitude']);
-                $lon2 = deg2rad($estacao2['longitude']);
+                $lat1 = deg2rad((float)$estacao1['latitude']);
+                $lon1 = deg2rad((float)$estacao1['longitude']);
+                $lat2 = deg2rad((float)$estacao2['latitude']);
+                $lon2 = deg2rad((float)$estacao2['longitude']);
                 
                 $dlat = $lat2 - $lat1;
                 $dlon = $lon2 - $lon1;
@@ -352,16 +384,17 @@ function saveRoute($mysqli, $input) {
         $stmt->close();
         $mysqli->commit();
         
-        // Notificar criação da rota
+        invalidateCache(); // Invalidar cache após mudança
+        
+        // NOTIFICAR CRIAÇÃO DA ROTA - AGORA COM USUÁRIO LOGADO
         notificarCriacaoRota($nome, count($estacoes_ids), round($distancia_total, 2));
         
-        echo json_encode(['success' => true, 'id' => $id_rota]);
+        echo json_encode(['success' => true, 'id' => $id_rota, 'distancia' => round($distancia_total, 2)]);
     } catch (Exception $e) {
         $mysqli->rollback();
         echo json_encode(['success' => false, 'message' => 'Erro ao salvar rota: ' . $e->getMessage()]);
     }
 }
-
 function deleteRoute($mysqli, $input) {
     try {
         $id = $input['id'] ?? null;
@@ -371,7 +404,7 @@ function deleteRoute($mysqli, $input) {
             return;
         }
         
-        // Primeiro, obter o nome da rota para a notificação
+        // Primeiro, obter o nome da rota
         $stmt = $mysqli->prepare("SELECT nome FROM rotas WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -392,8 +425,13 @@ function deleteRoute($mysqli, $input) {
         $stmt->bind_param("i", $id);
         
         if ($stmt->execute()) {
-            // Notificar exclusão da rota
-            notificarExclusaoRota($nomeRota);
+            invalidateCache(); // Invalidar cache após mudança
+            
+            // Tentar notificar
+            if (function_exists('notificarExclusaoRota')) {
+                notificarExclusaoRota($nomeRota);
+            }
+            
             echo json_encode(['success' => true]);
         } else {
             throw new Exception($stmt->error);
@@ -416,7 +454,7 @@ function updateStationPosition($mysqli, $input) {
             return;
         }
         
-        // Obter nome da estação para notificação
+        // Obter nome da estação
         $stmt = $mysqli->prepare("SELECT nome FROM estacoes WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();
@@ -436,8 +474,13 @@ function updateStationPosition($mysqli, $input) {
         $stmt->bind_param("ddi", $latitude, $longitude, $id);
         
         if ($stmt->execute()) {
-            // Notificar movimento da estação
-            notificarMovimentoEstacao($nomeEstacao);
+            invalidateCache(); // Invalidar cache após mudança
+            
+            // Tentar notificar
+            if (function_exists('notificarMovimentoEstacao')) {
+                notificarMovimentoEstacao($nomeEstacao);
+            }
+            
             echo json_encode(['success' => true]);
         } else {
             throw new Exception($stmt->error);

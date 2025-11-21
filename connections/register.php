@@ -18,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($checkEmailStmt->num_rows > 0) {
             $error = "E-mail já cadastrado.";
+            header("Location: ../pages/register_user.php");
         } else {
             $stmt = $conn->prepare("INSERT INTO usuario(user_name, user_mail, user_password) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $username, $email, $password);
@@ -29,9 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 exit;
             } else {
                 $error = "Erro ao cadastrar usuário.";
+                header("Location: ../pages/register_user.php");
             }
         }
     } else {
         $error = "A senha deve conter entre 6 e 26 caracteres alfabéticos.";
+        header("Location: ../pages/register_user.php");
     }
 }

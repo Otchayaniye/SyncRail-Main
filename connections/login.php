@@ -9,7 +9,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $password = trim($_POST["password"] ?? "");
 
     // Busca o usuário pelo email
-    $stmt = $conn->prepare("SELECT pk_user, user_name, user_password FROM usuario WHERE user_mail = ?");
+    $stmt = $conn->prepare("SELECT pk_user, user_name, user_password, user_adm FROM usuario WHERE user_mail = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $resultado = $stmt->get_result();
@@ -22,6 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION["user_name"] = $dados["user_name"];
             $_SESSION["user_id"] = $dados["pk_user"];
             $_SESSION["conected"] = true;
+            $_SESSION["admin"] = $dados["user_adm"];
             header("Location: ../pages/dashboard.php");
             exit;
         } else {
