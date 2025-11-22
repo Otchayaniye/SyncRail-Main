@@ -1,0 +1,52 @@
+.iconplus {
+  font-size: 1.5rem !important;
+  display: flex;
+  align-items: center;
+}
+
+.table-container {
+  max-height: 670px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-header {
+  flex-shrink: 0;
+}
+
+.table-body-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  max-height: 90%;
+}
+
+.table-body-container table {
+  margin-bottom: 0;
+}
+
+.table-body-container thead {
+  position: sticky;
+  top: 0;
+  background-color: #212529;
+  z-index: 10;
+}
+
+/* Custom scrollbar */
+.table-body-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-body-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-body-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.table-body-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

@@ -22,6 +22,9 @@
                     <li class="nav-item">
                         <a class="nav-link p-2" href="../pages/map.php">Mapa</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link p-2" href="../pages/repair.php">Manutenção</a>
+                    </li>
                 </ul>
             </div>
             <ul class="navbar-nav mb-0">

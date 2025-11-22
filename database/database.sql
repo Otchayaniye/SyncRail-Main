@@ -86,3 +86,15 @@ ALTER TABLE `rota_estacoes`
   ADD CONSTRAINT `rota_estacoes_ibfk_1` FOREIGN KEY (`id_rota`) REFERENCES `rotas` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `rota_estacoes_ibfk_2` FOREIGN KEY (`id_estacao`) REFERENCES `estacoes` (`id`) ON DELETE CASCADE;
 COMMIT;
+
+CREATE TABLE chamados (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    descricao TEXT NOT NULL,
+    prioridade ENUM('baixa', 'media', 'alta') NOT NULL,
+    status ENUM('aberto', 'em_andamento', 'fechado') DEFAULT 'aberto',
+    user_id INT NOT NULL,
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES usuario(pk_user) ON DELETE CASCADE
+);

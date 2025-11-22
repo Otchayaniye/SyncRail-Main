@@ -1,10 +1,19 @@
 <?php
 session_start();
+require_once('../connections/db.php');
 
 if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
     header("Location: ../index.php");
     exit;
 }
+
+$id = $_SESSION['user_id'];
+$stmt = $conn->prepare("SELECT user_adm FROM usuario WHERE pk_user = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$resultado = $stmt->get_result();
+$admin = $resultado->fetch_assoc();
+$_SESSION['admin'] = $admin['user_adm'];
 
 ?>
 <!DOCTYPE html>
@@ -26,10 +35,13 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
         <div class="" id="navbarSupportedContent">
             <ul class="navbar-nav">
                 <li>
-                    <a class="nav-link" href="../pages/dashboard.php">Status</a>
+                    <a class="nav-link" href="dashboard.php">Status</a>
                 </li>
                 <li>
-                    <a class="nav-link" href="../pages/map.php">Mapa</a>
+                    <a class="nav-link" href="map.php">Mapa</a>
+                </li>
+                <li>
+                    <a class="nav-link" href="repair.php">Manutenção</a>
                 </li>
             </ul>
             <ul class="navbar-nav">
@@ -44,14 +56,16 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
 
     <div class="container">
         <div class="sidebar">
-            <div class="control-group">
-                <button id="btn-add-station" class="btn"><i class="fas fa-plus-circle"></i> Estação</button>
-                <button id="btn-start-route" class="btn btn-warning"><i class="fas fa-route"></i> Nova Rota</button>
-            </div>
+            <div id="adminonly">
+                <div class="control-group " id="">
+                    <button id="btn-add-station" class="btn"><i class="fas fa-plus-circle"></i> Estação</button>
+                    <button id="btn-start-route" class="btn btn-warning"><i class="fas fa-route"></i> Nova Rota</button>
+                </div>
 
-            <div class="control-group">
-                <button id="btn-edit-mode" class="btn"><i class="fas fa-edit"></i> Editar</button>
-                <button id="btn-save" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button>
+                <div class="control-group " id="">
+                    <button id="btn-edit-mode" class="btn"><i class="fas fa-edit"></i> Editar</button>
+                    <button id="btn-save" class="btn btn-success"><i class="fas fa-save"></i> Salvar</button>
+                </div>
             </div>
 
 
@@ -131,6 +145,11 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script>
+        if (<?php echo $_SESSION['admin'] ?> === 0) {
+            document.getElementById("adminonly").style.display = "none";
+        }
+
+
         // Variáveis globais
         let map;
         let stations = [];
@@ -469,7 +488,7 @@ if (!isset($_SESSION["conected"]) || $_SESSION["conected"] != true) {
             currentRoute = [];
 
             document.getElementById('route-creator').style.display = 'block';
-            document.getElementById('route-name').value = `Rota ${routes.length + 1}`;
+            document.getElementById('route-name').value = `${routes.length + 1}`;
             updateRouteStationsList();
             updateStatus("Criando nova rota - Clique nas estações para adicioná-las à rota");
             map.getContainer().style.cursor = 'crosshair';

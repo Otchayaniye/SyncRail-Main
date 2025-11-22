@@ -58,7 +58,7 @@ function criarAlerta($titulo, $texto, $tipo = 'sistema') {
 // Funções específicas para cada tipo de ação
 function notificarCriacaoRota($nomeRota, $estacoesCount, $distancia) {
     $titulo = "Nova Rota Criada";
-    $texto = "Rota '{$nomeRota}' criada com {$estacoesCount} estações (" . number_format($distancia, 2) . " km)";
+    $texto = "Rota '{$nomeRota}' foi criada, unindo {$estacoesCount} estações (" . number_format($distancia, 2) . " km)";
     $result = criarAlerta($titulo, $texto, 'rota');
     
     if (!$result) {

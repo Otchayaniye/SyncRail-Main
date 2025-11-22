@@ -20,9 +20,8 @@ body {
 }
 
 .scrolly {
-    overflow: auto;
+    overflow-y: auto;
     scrollbar-color: var(--bg3) transparent;
-    overflow-x: scroll;
     scrollbar-width: thin;
 }
 
