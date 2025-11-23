@@ -27,13 +27,14 @@
                     </li>
                 </ul>
             </div>
-            <ul class="navbar-nav mb-0">
-                <li class="nav-item">
-                    <a href="../connections/exit.php">
-                        <input type="button" value="Sair" event="../connections/exit.php" class="btn-danger btn" />
-                    </a>
-                </li>
+            <ul class="navbar-nav mb-0 drop">
+                <button><i class="bi bi-person-circle"></i></button>
+                <div class="dropdown-options">
+                    <a class="nav-link p-2" href="../pages/about.php">Sobre</a>
+                    <a href="../connections/exit.php" class="btn-danger btn">Sair</a>
+                </div>
             </ul>
+
 
         </div>
     </div>

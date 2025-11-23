@@ -26,6 +26,7 @@ $_SESSION['admin'] = $admin['user_adm'];
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="../css/map.css">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
@@ -44,12 +45,12 @@ $_SESSION['admin'] = $admin['user_adm'];
                     <a class="nav-link" href="repair.php">Manutenção</a>
                 </li>
             </ul>
-            <ul class="navbar-nav">
-                <li>
-                    <a href="../connections/exit.php">
-                        <input type="button" value="Sair" event="../connections/exit.php" class="buttonexitmenu" />
-                    </a>
-                </li>
+            <ul class="navbar-nav mb-0 drop">
+                <button><i class="bi bi-person-circle"></i></button>
+                <div class="dropdown-options">
+                    <a class="nav-link p-2" href="../pages/about.php">Sobre</a>
+                    <a href="../connections/exit.php" class="btn-danger btn">Sair</a>
+                </div>
             </ul>
         </div>
     </div>

@@ -32,6 +32,16 @@ body {
     transform: scale(1.05);
 }
 
+.drop{
+    text-align: center;
+    z-index: 1001;
+    padding-top: 2px;
+}
+
+.about{
+    padding-right: 0.5rem;
+}
+
 .navbar a{
     text-decoration: none;
     display: flex;
