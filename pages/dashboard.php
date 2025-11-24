@@ -27,7 +27,7 @@ if ($resultado->num_rows === 0) {
 }
 
 $admin = $resultado->fetch_assoc();
-$_SESSION['admin'] = (int)$admin['user_adm'];
+$_SESSION['admin'] = (int) $admin['user_adm'];
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -56,9 +56,7 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
             <div class=" d-flex w-100 justify-content-between mb-3" id="boxtituloalerta">
                 <h3 class="alertat" id="tituloAlerta">Alertas</h3>
 
-                <button class="btn p-0 iconplus ps-3 pe-3"
-                    onclick="abrircriaralerta()"
-                    id="adminonly"
+                <button class="btn p-0 iconplus ps-3 pe-3" onclick="abrircriaralerta()" id="adminonly"
                     data-is-admin="<?= htmlspecialchars($_SESSION['admin']) ?>">
                     <i class="bi bi-plus-circle"></i>
                 </button>
@@ -70,8 +68,10 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
                     </div>
 
                     <form id="formCriarAlerta" class="d-flex flex-column align-items-center gap-2">
-                        <input type="text" id="titulo" name="alerta_titulo" placeholder="Título" class="form-control fontc text-center" autocomplete="off" required>
-                        <input type="text" id="descr" name="descr" placeholder="Descrição" class="form-control fontc text-center" autocomplete="off" required>
+                        <input type="text" id="titulo" name="alerta_titulo" placeholder="Título"
+                            class="form-control fontc text-center" autocomplete="off" required>
+                        <input type="text" id="descr" name="descr" placeholder="Descrição"
+                            class="form-control fontc text-center" autocomplete="off" required>
                         <button type="submit" class="btn border bg-danger w-50 mt-2">Enviar</button>
                     </form>
 
@@ -95,7 +95,7 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
                         echo '<a class="linkveralerta p-2 rounded bg-light ' . $tipoClasse . '" data-alerta-id="' . htmlspecialchars($linha['pk_alerta']) . '">
                 <div><strong>' . htmlspecialchars($linha['alerta_titulo']) . '</strong></div>
                 <div>' . htmlspecialchars($linha['fk_user_name']) . '</div>
-                <div class="w-100 text-end fs-6"><span><em>' . htmlspecialchars($linha['alerta_data']) . '</em></span></div>
+                <div class="w-100 text-end fs-6"><span><em>' . htmlspecialchars($linha['alerta_data_formatada']) . '</em></span></div>
               </a>';
                     }
                 }
@@ -139,7 +139,7 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
             const isAdmin = document.getElementById('adminonly').dataset.isAdmin === '1';
             document.getElementById("adminonly").style.display = isAdmin ? "block" : "none";
 
-            $(document).on('click', '.linkveralerta', function(event) {
+            $(document).on('click', '.linkveralerta', function (event) {
                 event.preventDefault();
                 var alertaID = $(this).data('alerta-id');
                 const alertaIdint = parseInt(alertaID, 10);
@@ -152,7 +152,7 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
                         alertaId: alertaIdint
                     },
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             // Preencher o popup com os dados do alerta
                             $('#alertaTitulo').text(response.alerta_titulo);
@@ -165,43 +165,95 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
                             alert('Erro ao carregar o alerta: ' + response.message);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error("Erro AJAX:", error);
                         alert('Erro ao carregar o alerta. Tente novamente.');
                     }
                 });
             });
 
-            $(document).on('click', '.btnexcluiralerta', function(event) {
+            // Variável global para armazenar o ID do alerta atual
+            let currentAlertaId = null;
+
+            $(document).on('click', '.linkveralerta', function (event) {
                 event.preventDefault();
-                var alertaID = $('.linkveralerta').data('alerta-id');
-                const alertaIdint = parseInt(alertaID, 10);
+                var alertaID = $(this).data('alerta-id');
+                currentAlertaId = parseInt(alertaID, 10); // Armazena o ID globalmente
+
+                // Fazer requisição AJAX para buscar os dados do alerta
+                $.ajax({
+                    url: '../connections/get_alerta.php',
+                    type: 'POST',
+                    data: {
+                        alertaId: currentAlertaId
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            // Preencher o popup com os dados do alerta
+                            $('#alertaTitulo').text(response.alerta_titulo);
+                            $('#alertaTexto').html(response.alerta_texto.replace(/\n/g, '<br>'));
+                            $('#alertaUser').html(response.fk_user_name);
+                            $('#alertaUserEmail').html(response.fk_user_mail);
+                            $('#alertaInfo').html(response.alerta_data);
+
+                            // Mostrar/ocultar botão de excluir baseado no admin
+                            if (isAdmin) {
+                                $('.btnexcluiralerta').show();
+                            } else {
+                                $('.btnexcluiralerta').hide();
+                            }
+
+                            abrirveralerta();
+                        } else {
+                            alert('Erro ao carregar o alerta: ' + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Erro AJAX:", error);
+                        alert('Erro ao carregar o alerta. Tente novamente.');
+                    }
+                });
+            });
+
+            $(document).on('click', '.btnexcluiralerta', function (event) {
+                event.preventDefault();
+
+                if (!currentAlertaId) {
+                    alert('Nenhum alerta selecionado');
+                    return;
+                }
+
+                if (!confirm('Tem certeza que deseja excluir este alerta?')) {
+                    return;
+                }
+
                 $.ajax({
                     url: '../connections/deletewarning.php',
                     type: 'POST',
                     data: {
-                        alertaId: alertaIdint
+                        alertaId: currentAlertaId
                     },
                     dataType: 'json',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             fecharveralerta();
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 location.reload();
                             }, 500);
                         } else {
                             alert('Erro ao tentar excluir alerta: ' + response.message);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         console.error("Erro AJAX:", error);
                         alert('Erro ao tentar excluir o alerta. Tente novamente.');
                     }
                 });
             });
-            $(document).ready(function() {
+            $(document).ready(function () {
                 // Submissão do formulário de criar alerta
-                $('#formCriarAlerta').on('submit', function(e) {
+                $('#formCriarAlerta').on('submit', function (e) {
                     e.preventDefault();
 
                     // Mostrar loading
@@ -216,14 +268,14 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
                         type: 'POST',
                         data: formData,
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
                             if (response.success) {
 
                                 // Limpar formulário
                                 $('#formCriarAlerta')[0].reset();
 
                                 // Recarregar a lista de alertas após 1 segundo
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     location.reload();
                                 }, 500);
 
@@ -235,14 +287,14 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
                                     .show();
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             $('#alertaMensagem')
                                 .html('<i class="bi bi-exclamation-triangle"></i> Erro de conexão. Tente novamente.')
                                 .addClass('alert-danger')
                                 .show();
                             console.error('Erro AJAX:', error);
                         },
-                        complete: function() {
+                        complete: function () {
                             // Reativar botão
                             $('button[type="submit"]').prop('disabled', false).html('Enviar');
                         }
@@ -250,15 +302,15 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
                 });
 
                 // Fechar popup ao pressionar ESC
-                $(document).on('keyup', function(e) {
+                $(document).on('keyup', function (e) {
                     if (e.key === 'Escape') {
                         fecharcriaralerta();
                     }
                 });
 
                 // Focar no primeiro campo quando abrir o popup
-                $(document).on('click', '#btn-add-alert', function() {
-                    setTimeout(function() {
+                $(document).on('click', '#btn-add-alert', function () {
+                    setTimeout(function () {
                         $('#titulo').focus();
                     }, 300);
                 });

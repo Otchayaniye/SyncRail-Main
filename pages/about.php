@@ -24,7 +24,7 @@ if ($resultado->num_rows === 0) {
     exit;
 }
 $admin = $resultado->fetch_assoc();
-$_SESSION['admin'] = (int)$admin['user_adm'];
+$_SESSION['admin'] = (int) $admin['user_adm'];
 
 ?>
 <!DOCTYPE html>
@@ -34,6 +34,7 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/about.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -42,22 +43,21 @@ $_SESSION['admin'] = (int)$admin['user_adm'];
 </head>
 
 <body class="backgroundf min-vh-100 d-flex flex-column justify-content-center">
-    <div class="container bgcont rounded p-5">
-        <div class="text-center d-flex flex-column justify-content-evenly align-items-center h-100">
-                <h1>Sobre o SyncRail</h1>
-                <h5 class="mt-4 pe-2 w-50">O SyncRail é uma aplicação desenvolvida para monitorar e gerenciar frotas de veículos
+    <div class="container bgcont rounded p-2">
+        <div class="text-center d-flex flex-column justify-content-evenly align-items-center h-100 scrolly">
+            <h1 class="">Sobre o SyncRail</h1>
+            <p class="fs-5 textobase">O SyncRail é uma aplicação desenvolvida para monitorar e gerenciar frotas de veículos
                     ferroviários em tempo real. Com uma interface intuitiva, o SyncRail oferece
                     soluções eficientes para otimizar operações, melhorar a segurança e aumentar a produtividade das
-                    frotas.</h5>
-            <div class="">
-                <h2 class="mt-5">Recursos Principais</h2>
-                <ul class="text-center mt-3">
-                    <li class="list-group-item fs-5">Monitoramento em tempo real da localização dos veículos.</li>
-                    <li class="list-group-item fs-5">Alertas automáticos para manutenção preventiva.</li>
-                    <li class="list-group-item fs-5">Relatórios detalhados de desempenho da frota.</li>
-                    <li class="list-group-item fs-5">Interface amigável para fácil navegação e uso.</li>
-                </ul>
-            </div>
+                    frotas.
+                <p class="fs-5 textobase">O sistema oferece diversas ferramentas para
+                    monitoramento de trens e rotas, além de
+                    ter opções para atualizar e administrar o monitoramento dos que estão em funcionamento ou em
+                    conserto, é
+                    possível também emitir alertas para os usuários. O aplicativo oferece um mapa em tempo real dos
+                    trens e suas rotas, é possível ver as
+                    rotas e paradas dos trens e quais trens passam por certas rotas. Além das funções já mencionadas é
+                    possível acompanhar trens e rotas em manutenção.</p>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

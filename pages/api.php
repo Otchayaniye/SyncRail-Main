@@ -1,7 +1,4 @@
 <?php
-// api.php - Backend para gerenciar estações e rotas (CORRIGIDO)
-
-// DESATIVAR TODOS OS ERROS E WARNINGS ANTES DO HEADER
 error_reporting(0);
 ini_set('display_errors', 0);
 
@@ -10,11 +7,10 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Configurações do banco de dados
-$host = "localhost:3307";
+$host = "localhost";
 $usuario = "root";
-$senha = "";
-$banco = "tsf"; // Usando o banco tsf
+$senha = "root";
+$banco = "tsf";
 
 // Criar conexão MySQLi
 $mysqli = new mysqli($host, $usuario, $senha, $banco);

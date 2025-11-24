@@ -19,30 +19,33 @@ if (!isset($_POST['alertaId']) || empty($_POST['alertaId'])) {
 $alertaId = intval($_POST['alertaId']);
 
 try {
-    // Buscar os dados do alerta
-    $sql = "DELETE FROM alertas WHERE pk_alerta = ?";
-    $stmt = $conn->prepare($sql);
-    if ($stmt === false) {
-        throw new Exception("Prepare failed: " . $conn->error);
-    }
-    $stmt->bind_param("i", $alertaId);
-    $stmt->execute();
-
-    $sql = "SELECT pk_alerta FROM alertas WHERE pk_alerta = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $alertaId);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
+    // Verificar se o alerta existe antes de excluir
+    $checkSql = "SELECT pk_alerta FROM alertas WHERE pk_alerta = ?";
+    $checkStmt = $conn->prepare($checkSql);
+    $checkStmt->bind_param("i", $alertaId);
+    $checkStmt->execute();
+    $checkResult = $checkStmt->get_result();
     
-    if ($resultado && $resultado->num_rows === 0) {
-        echo json_encode(['success' => true,]);
-    } else {
+    if ($checkResult->num_rows === 0) {
         echo json_encode(['success' => false, 'message' => 'Alerta não encontrado']);
+        $checkStmt->close();
+        exit;
     }
-    if ($resultado) {
-        $resultado->free();
+    $checkStmt->close();
+    
+    // Excluir o alerta
+    $deleteSql = "DELETE FROM alertas WHERE pk_alerta = ?";
+    $deleteStmt = $conn->prepare($deleteSql);
+    $deleteStmt->bind_param("i", $alertaId);
+    
+    if ($deleteStmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Alerta excluído com sucesso']);
+    } else {
+        throw new Exception("Erro ao excluir alerta: " . $deleteStmt->error);
     }
-    $stmt->close();
+    
+    $deleteStmt->close();
+    
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Erro no servidor: ' . $e->getMessage()]);
 } finally {

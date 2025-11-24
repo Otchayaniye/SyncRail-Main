@@ -1,0 +1,15 @@
+@media (min-width: 992px) {
+    .bgcont {
+        width: 60vw !important;
+    }
+}
+
+.textobase {
+    width: 80% !important;
+}
+
+@media (max-width: 767px) {
+    .textobase {
+        width: 100% !important;
+    }
+}

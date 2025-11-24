@@ -11,6 +11,11 @@
   margin-left: calc((var(--larguraboxtituloalerta)) / 2 - (var(--larguratituloalerta) / 2));
 }
 
+.textoalerta {
+  overflow: auto !important;
+  max-height: 200px;
+}
+
 .popup {
   display: none;
   position: fixed;
@@ -59,10 +64,8 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   z-index: 10;
   min-width: 250px;
-  max-width: 60%;
-  max-height: 70%;
-  overflow: hidden;
-  overflow-x: scroll;
+  max-width: 500px;
+  max-height: 60%;
 }
 
 .overlayveralerta {

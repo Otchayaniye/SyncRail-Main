@@ -43,7 +43,7 @@ $chamados = $stmt->get_result();
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <title>Dashboard</title>
     <style>
-        
+
     </style>
 </head>
 
@@ -87,23 +87,21 @@ $chamados = $stmt->get_result();
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                        </table>
-                    </div>
-                    <div class="table-body-container">
-                        <table class="table table-striped table-hover">
                             <tbody>
                                 <?php while ($chamado = $chamados->fetch_assoc()): ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($chamado['titulo']); ?></td>
                                         <td><?php echo htmlspecialchars($chamado['descricao']); ?></td>
                                         <td>
-                                            <span class="badge 
+                                            <span
+                                                class="badge 
                                                 <?php echo $chamado['prioridade'] == 'alta' ? 'bg-danger' : ($chamado['prioridade'] == 'media' ? 'bg-warning' : 'bg-info'); ?>">
                                                 <?php echo ucfirst($chamado['prioridade']); ?>
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge 
+                                            <span
+                                                class="badge 
                                                 <?php echo $chamado['status'] == 'aberto' ? 'bg-success' : ($chamado['status'] == 'em_andamento' ? 'bg-warning' : 'bg-secondary'); ?>">
                                                 <?php echo ucfirst($chamado['status']); ?>
                                             </span>
@@ -115,8 +113,7 @@ $chamados = $stmt->get_result();
                                         <td>
                                             <div class="btn-group">
                                                 <?php if ($_SESSION['admin'] == 1 || $chamado['user_id'] == $_SESSION['user_id']): ?>
-                                                    <button class="btn btn-sm btn-outline-primary"
-                                                        data-bs-toggle="modal"
+                                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                                                         data-bs-target="#editarChamadoModal"
                                                         onclick="carregarChamado(<?php echo $chamado['id']; ?>)">
                                                         <i class="bi bi-pencil"></i>
@@ -144,7 +141,8 @@ $chamados = $stmt->get_result();
     </div>
 
     <!-- Modal Criar Chamado -->
-    <div class="modal fade" id="criarChamadoModal" tabindex="-1" aria-labelledby="criarChamadoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="criarChamadoModal" tabindex="-1" aria-labelledby="criarChamadoModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -180,7 +178,8 @@ $chamados = $stmt->get_result();
     </div>
 
     <!-- Modal Editar Chamado -->
-    <div class="modal fade" id="editarChamadoModal" tabindex="-1" aria-labelledby="editarChamadoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="editarChamadoModal" tabindex="-1" aria-labelledby="editarChamadoModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -196,7 +195,8 @@ $chamados = $stmt->get_result();
                         </div>
                         <div class="mb-3">
                             <label for="editar_descricao" class="form-label">Descrição</label>
-                            <textarea class="form-control" id="editar_descricao" name="descricao" rows="3" required></textarea>
+                            <textarea class="form-control" id="editar_descricao" name="descricao" rows="3"
+                                required></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="editar_prioridade" class="form-label">Prioridade</label>

@@ -5,9 +5,9 @@ require_once('db.php');
 
 function criarAlerta($titulo, $texto, $tipo = 'sistema') {
     // Criar uma nova conexão para as notificações
-    $host = "localhost:3307";
+    $host = "localhost";
     $usuario = "root";
-    $senha = "";
+    $senha = "root";
     $banco = "tsf";
     
     $conn_notificacao = new mysqli($host, $usuario, $senha, $banco);
