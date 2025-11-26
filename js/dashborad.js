@@ -28,3 +28,7 @@ const elementotituloalerta = document.getElementById('tituloAlerta');
             document.getElementById("popmostraralerta").style.display = "none";
             document.getElementById("mostraralertaoverlay").style.display = "none";
         }
+
+
+
+        

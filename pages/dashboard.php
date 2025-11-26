@@ -37,6 +37,8 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/status.css">
+    <link rel="stylesheet" href="../css/train.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -44,24 +46,81 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
     <title>Dashboard</title>
 </head>
 
-<body class="backgroundf min-vh-100 d-flex flex-column justify-content-center">
-    <div class="container d-flex justify-content-evenly align-items-stretch bgcont rounded p-3">
-        <div class="p-2 lbox scrolly">yht</div>
+<body class="bg2 min-vh-100 d-flex flex-column justify-content-center">
+    <div class="container d-flex justify-content-evenly align-items-stretch bgcont rounded p-0 gap-4">
+        <div class="lbox d-flex flex-column gap-4">
+            <div class="w-100 bg4 h-100 rounded p-2">
+                <div class="bg6 w-100 h-100 rounded">
+                    <div class="train-content">
+                        <div class="train-scene rounded">
+                            <div class="train-background"></div>
+                            <div class="train-mountains"></div>
+
+                            <!-- PRIMEIRO: Trilhos (fundo) -->
+                            <div class="train-track">
+                                <div class="train-rail"></div>
+                                <div class="train-sleepers">
+                                    <!-- Os dormentes serão adicionados via JavaScript -->
+                                </div>
+                            </div>
+
+                            <!-- DEPOIS: Trem (sobre os trilhos) -->
+                            <div class="train-container">
+                                <div class="train">
+                                    <div class="train-locomotive">
+                                        <div class="train-chimney"></div>
+                                        <div class="train-smoke"></div>
+                                        <div class="train-smoke"></div>
+                                        <div class="train-smoke"></div>
+                                    </div>
+                                    <div class="train-wagon"></div>
+                                    <div class="train-wagon train-wagon-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="train-controls">
+                            <button class="train-btn" id="goLeft">
+                                <i class="bi bi-caret-left-fill train-btn-left"></i>
+                            </button>
+                            <button class="train-btn" id="stop">
+                                <i class="bi bi-pause-fill train-btn-stop"></i>
+                            </button>
+                            <button class="train-btn" id="goRight">
+                                <i class="bi bi-caret-right-fill train-btn-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 
+            <div class="w-100 h-100 d-flex gap-4">
+                <div class="w-100 bg3 h-100 rounded p-2 text-center">
+                    <div class="bg6 w-100 h-100 rounded pe-4 ps-4">
+                        <!-- <canvas id="temperaturaGauge"></canvas> -->
+                        <h5>Umidade</h5>
+                    </div>
+                </div>
+                <div class="w-100 bg1 h-100 rounded p-2 text-center">
+                    <div class="bg6 w-100 h-100 rounded pe-4 ps-4">
+                        <!-- <canvas id="temperaturaGauge"></canvas> -->
+                        <h5>Temperatura</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
-
-        <div class="rbox d-flex flex-column align-items-center bg-success rounded">
+        <div class="rbox d-flex flex-column align-items-center bg3 rounded">
             <div class=" d-flex w-100 justify-content-between mb-3" id="boxtituloalerta">
-                <h3 class="alertat" id="tituloAlerta">Alertas</h3>
+                <h4 class="alertat" id="tituloAlerta">Alertas</h4>
 
-                <button class="btn p-0 iconplus ps-3 pe-3" onclick="abrircriaralerta()" id="adminonly"
+                <button class="btn p-0 iconplus ps-2 pe-1" onclick="abrircriaralerta()" id="adminonly"
                     data-is-admin="<?= htmlspecialchars($_SESSION['admin']) ?>">
                     <i class="bi bi-plus-circle"></i>
                 </button>
-                <!-- No dashboard.php, substitua o formulário atual por este: -->
-                <div id="popcriaralerta" class="popup rounded">
+                <div id="popcriaralerta" class="popup bg6 rounded">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h3 class="m-0 p-0">Novo Aviso</h3>
                         <button class="btn btf" onclick="fecharcriaralerta()"><i class="bi bi-x-lg"></i></button>
@@ -72,10 +131,9 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                             class="form-control fontc text-center" autocomplete="off" required>
                         <input type="text" id="descr" name="descr" placeholder="Descrição"
                             class="form-control fontc text-center" autocomplete="off" required>
-                        <button type="submit" class="btn border bg-danger w-50 mt-2">Enviar</button>
+                        <button type="submit" class="btn border bg3 w-50 mt-2 text-light">Enviar</button>
                     </form>
 
-                    <!-- Mensagem de status -->
                     <div id="alertaMensagem" class="mt-2 text-center" style="display: none;"></div>
 
                     <?php if (!empty($error)): ?>
@@ -85,14 +143,13 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
             </div>
             <div id="criaralertaoverlay" class="overlay"></div>
 
-            <div class="w-100 p-2 d-flex flex-column gap-2 alertacorpo scrolly h-100 bg-danger rounded">
-
+            <div class="w-100 p-2 d-flex flex-column gap-2 alertacorpo scrolly h-100 bg2 rounded">
                 <?php
                 include("../connections/warndisplay.php");
                 if (!empty($alerta)) {
                     foreach ($alerta as $linha) {
                         $tipoClasse = 'alerta-' . ($linha['alerta_tipo'] ?? 'sistema');
-                        echo '<a class="linkveralerta p-2 rounded bg-light ' . $tipoClasse . '" data-alerta-id="' . htmlspecialchars($linha['pk_alerta']) . '">
+                        echo '<a class="linkveralerta p-2 rounded bg6 ' . $tipoClasse . '" data-alerta-id="' . htmlspecialchars($linha['pk_alerta']) . '">
                 <div><strong>' . htmlspecialchars($linha['alerta_titulo']) . '</strong></div>
                 <div>' . htmlspecialchars($linha['fk_user_name']) . '</div>
                 <div class="w-100 text-end fs-6"><span><em>' . htmlspecialchars($linha['alerta_data_formatada']) . '</em></span></div>
@@ -102,8 +159,7 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                 ?>
             </div>
 
-            <!-- Popup para mostrar alerta -->
-            <div class="popupveralerta rounded p-2" id="popmostraralerta">
+            <div class="popupveralerta rounded bg6 p-2" id="popmostraralerta">
                 <div class="d-flex justify-content-between align-items-center mb-2 ">
                     <h3 class="m-0 p-2" id="alertaTitulo">Carregando...</h3>
                     <button class="btn btf p-2" onclick="fecharveralerta()"><i class="bi bi-x-lg"></i></button>
@@ -122,8 +178,7 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                     </div>
                 </div>
                 <div class="w-100 d-flex p-2 justify-content-center">
-                    <button class="btn btnexcluiralerta bg-danger w-75">Excluir</button>
-
+                    <button class="btn btnexcluiralerta btn-outline-danger w-50">Excluir</button>
                 </div>
 
             </div>
@@ -135,6 +190,7 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
             integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
             crossorigin="anonymous"></script>
         <script src="../js/dashborad.js"></script>
+        <script src="../js/train.js"></script>
         <script>
             const isAdmin = document.getElementById('adminonly').dataset.isAdmin === '1';
             document.getElementById("adminonly").style.display = isAdmin ? "block" : "none";
@@ -144,7 +200,6 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                 var alertaID = $(this).data('alerta-id');
                 const alertaIdint = parseInt(alertaID, 10);
 
-                // Fazer requisição AJAX para buscar os dados do alerta
                 $.ajax({
                     url: '../connections/get_alerta.php',
                     type: 'POST',
@@ -172,15 +227,13 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                 });
             });
 
-            // Variável global para armazenar o ID do alerta atual
             let currentAlertaId = null;
 
             $(document).on('click', '.linkveralerta', function (event) {
                 event.preventDefault();
                 var alertaID = $(this).data('alerta-id');
-                currentAlertaId = parseInt(alertaID, 10); // Armazena o ID globalmente
+                currentAlertaId = parseInt(alertaID, 10);
 
-                // Fazer requisição AJAX para buscar os dados do alerta
                 $.ajax({
                     url: '../connections/get_alerta.php',
                     type: 'POST',
@@ -252,15 +305,12 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                 });
             });
             $(document).ready(function () {
-                // Submissão do formulário de criar alerta
                 $('#formCriarAlerta').on('submit', function (e) {
                     e.preventDefault();
 
-                    // Mostrar loading
                     $('#alertaMensagem').hide().removeClass('alert-success alert-danger');
                     $('button[type="submit"]').prop('disabled', true).html('<i class="bi bi-hourglass-split"></i> Enviando...');
 
-                    // Coletar dados do formulário
                     var formData = $(this).serialize();
 
                     $.ajax({
@@ -271,16 +321,13 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                         success: function (response) {
                             if (response.success) {
 
-                                // Limpar formulário
                                 $('#formCriarAlerta')[0].reset();
 
-                                // Recarregar a lista de alertas após 1 segundo
                                 setTimeout(function () {
                                     location.reload();
                                 }, 500);
 
                             } else {
-                                // Erro
                                 $('#alertaMensagem')
                                     .html('<i class="bi bi-exclamation-triangle"></i> ' + response.message)
                                     .addClass('alert-danger')
@@ -295,26 +342,70 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                             console.error('Erro AJAX:', error);
                         },
                         complete: function () {
-                            // Reativar botão
                             $('button[type="submit"]').prop('disabled', false).html('Enviar');
                         }
                     });
                 });
 
-                // Fechar popup ao pressionar ESC
                 $(document).on('keyup', function (e) {
                     if (e.key === 'Escape') {
                         fecharcriaralerta();
                     }
                 });
 
-                // Focar no primeiro campo quando abrir o popup
                 $(document).on('click', '#btn-add-alert', function () {
                     setTimeout(function () {
                         $('#titulo').focus();
                     }, 300);
                 });
             });
+
+            var temperatura = 0;
+
+            const ctx = document.getElementById('temperaturaGauge').getContext('2d');
+            const gauge = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [temperatura, 50 - temperatura],
+                        backgroundColor: [
+                            getCorTemperatura(temperatura),
+                            '#f0f0f0'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    circumference: 270,
+                    rotation: 225,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+
+            function getCorTemperatura(temp) {
+                if (temp < 20) return '#3498db';
+                if (temp < 30) return '#f39c12';
+                return '#e74c3c';
+            }
+
+            function set_Temperature() {
+
+                fetch('get_messages.php')
+                    .then(r => r.text())
+                    .then(data => {
+                        console.log("Recebido:", data);
+                        if (data.trim() != "") {
+                            temperatura.textContent = data.trim();
+                        }
+                    })
+                    .catch(err => console.error(err));
+            }
+            setInterval(set_Temperature, 1000);
+
         </script>
 </body>
 

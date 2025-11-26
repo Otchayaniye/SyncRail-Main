@@ -1,5 +1,5 @@
 .bgform{
-    background-color: var(--bg1);
+    background-color: var(--bg6);
 }
 
 .fontc{
@@ -8,7 +8,7 @@
 
 .btf{
     background-color: var(--bg3);
-    color: #14100E;
+    color: var(--bg6);
     border: none;
     width: 90%;
     border-radius: 20px;
@@ -16,11 +16,11 @@
 }
 
 .link{
-    color: var(--bg4);
+    color: var(--bg3);
     
 }
 .link:hover{
-    color: var(--bg5);
+    color: var(--bg1);
 }
 
 input:focus::placeholder{
@@ -32,8 +32,7 @@ input:focus::placeholder{
 }
 
 .fontc:focus{
-    box-shadow: 0 0 0 .25rem rgba(176, 177, 153, .69) !important;
-    border-color: var(--bg3) !important;
+    box-shadow: 0 0 0 .25rem rgba(153, 174, 177, 0.69) !important;
 }
 
 input::placeholder{

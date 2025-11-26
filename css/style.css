@@ -1,21 +1,39 @@
 body {
     padding: 7vh 20px;
-    --bg1: #FAF9F8;
-    --bg2: #8A8E8A;
-    --bg3: #B0B199;
-    --bg4: #727D85;
-    --bg5: #5A565E;
+    --bg1: #023535;
+    --bg2: #015958;
+    --bg3: #019587;
+    --bg4: #31B69B;
+    --bg5: #FACFCE;
+    --bg6: #F2E9D4;
     padding-top: calc(7vh + 56px);
 }
 
-.backgroundf {
-    background-color: var(--bg5);
+*{
+    font-family: "Nunito", sans-serif;
+}
 
+.bg1 {
+    background-color: var(--bg1) !important;
+}
+.bg2 {
+    background-color: var(--bg2) !important;
+}
+.bg3 {
+    background-color: var(--bg3) !important;
+}
+.bg4 {
+    background-color: var(--bg4) !important;
+}
+.bg5 {
+    background-color: var(--bg5) !important;
+}
+.bg6 {
+    background-color: var(--bg6) !important;
 }
 
 .bgcont {
-    background-color: var(--bg1);
-    height: 78vh;
+    height: 70vh;
 
 }
 
@@ -26,7 +44,11 @@ body {
 }
 
 .bgmenu {
-    background-color: var(--bg3);
+    background-color: var(--bg1);
+}
+
+.textcream{
+    color: var(--bg6) !important;
 }
 
 .menuexit {

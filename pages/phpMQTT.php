@@ -137,17 +137,47 @@ class phpMQTT
         }
 
         if ($this->cafile) {
-            $socketContext = stream_context_create(
-                [
-                    'ssl' => [
-                        'verify_peer_name' => true,
-                        'cafile' => $this->cafile
-                    ]
+
+            $socketContext = stream_context_create([
+                'ssl' => [
+                    'verify_peer'       => true,
+                    'verify_peer_name'  => true,
+                    'allow_self_signed' => false,
+                    'cafile'            => $this->cafile,
+                    'crypto_method'     => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
                 ]
+            ]);
+
+            // Importante: usar ssl://, não tls://
+            $this->socket = stream_socket_client(
+                'ssl://' . $this->address . ':' . $this->port,
+                $errno,
+                $errstr,
+                60,
+                STREAM_CLIENT_CONNECT,
+                $socketContext
             );
-            $this->socket = stream_socket_client('tls://' . $this->address . ':' . $this->port, $errno, $errstr, 60, STREAM_CLIENT_CONNECT, $socketContext);
         } else {
-            $this->socket = stream_socket_client('tcp://' . $this->address . ':' . $this->port, $errno, $errstr, 60, STREAM_CLIENT_CONNECT);
+
+            // Fallback usando CA padrão do Linux
+            $context = stream_context_create([
+                'ssl' => [
+                    'verify_peer'       => true,
+                    'verify_peer_name'  => true,
+                    'allow_self_signed' => false,
+                    'cafile'            => $this->cafile,
+                    'crypto_method'     => STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+                ],
+            ]);
+
+            $this->socket = stream_socket_client(
+                'ssl://' . $this->address . ':' . $this->port,
+                $errno,
+                $errstr,
+                60,
+                STREAM_CLIENT_CONNECT,
+                $context
+            );
         }
 
         if (!$this->socket) {

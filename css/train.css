@@ -1,0 +1,400 @@
+.train-content {
+    height: 100%;
+    width: 100%;
+}
+
+.train-scene {
+    position: relative;
+    height: 85%;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(to bottom, #87CEEB, #E0F7FF);
+}
+
+.train-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(to bottom, transparent 60%, #5D4037 60%),
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="%234CAF50" width="100" height="100"/></svg>') 0 0 / 100px 100px;
+}
+
+.train-mountains {
+    position: absolute;
+    top: 0;
+    bottom: auto;
+    width: 100%;
+    height: 61%;
+    background:
+        linear-gradient(75deg, transparent 30%, #388E3C 30%) 0 0,
+        linear-gradient(-75deg, transparent 30%, #2E7D32 30%) 0 0;
+    background-size: 100px 100%;
+    background-repeat: repeat-x;
+    opacity: 0.7;
+}
+
+/* Trilhos */
+.train-track {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 35px;
+    background: #5D4037;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+}
+
+.train-rail {
+    position: absolute;
+    width: 100%;
+    height: 0px;
+    background: #212121;
+    animation: train-move-rail 2s linear infinite;
+    /* Mais lento */
+}
+
+.train-rail::before,
+.train-rail::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 6px;
+    background: #212121;
+}
+
+.train-rail::before {
+    top: -30px;
+    height: 6px;
+}
+
+.train-rail::after {
+    top: 12px;
+    height: 6px;
+}
+
+.train-sleepers {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    animation: train-move-sleepers 1s linear infinite;
+    /* Mais lento */
+}
+
+.train-sleeper {
+    position: absolute;
+    width: 16px;
+    height: 62px;
+    background: #8D6E63;
+    bottom: 0;
+}
+
+.train-container {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    width: 534px;
+}
+
+.train {
+    position: relative;
+    width: 100%;
+    height: 120px;
+}
+
+.train-locomotive {
+    position: absolute;
+    width: 214px;
+    height: 110px;
+    background: linear-gradient(to bottom, #E53935, #B71C1C);
+    border-radius: 12px 12px 0 0;
+    left: 0;
+    top: 0px;
+    z-index: 2;
+}
+
+.train-locomotive::before {
+    content: '';
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background: #1A237E;
+    border-radius: 6px;
+    top: -30px;
+    left: 17px;
+}
+
+.train-locomotive::after {
+    content: '';
+    position: absolute;
+    width: 54px;
+    height: 54px;
+    background: #FFC107;
+    border-radius: 50%;
+    top: 20px;
+    right: 26px;
+}
+
+.train-chimney {
+    position: absolute;
+    width: 32px;
+    height: 40px;
+    background: #212121;
+    top: -40px;
+    left: 32px;
+    border-radius: 6px 6px 0 0;
+}
+
+.train-smoke {
+    position: absolute;
+    width: 43px;
+    height: 43px;
+    background: #BDBDBD;
+    border-radius: 50%;
+    top: -90px;
+    left: 28px;
+    opacity: 0.8;
+    animation: train-smoke 4s infinite;
+    /* Mais lento */
+}
+
+.train-smoke:nth-child(2) {
+    animation-delay: 0.8s;
+    /* Ajustado */
+    top: -120px;
+    left: 19px;
+}
+
+.train-smoke:nth-child(3) {
+    animation-delay: 1.6s;
+    /* Ajustado */
+    top: -150px;
+    left: 36px;
+}
+
+.train-wagon {
+    position: absolute;
+    width: 140px;
+    height: 100px;
+    background: linear-gradient(to bottom, #2196F3, #0D47A1);
+    border-radius: 6px;
+    left: 224px;
+    top: 10px;
+}
+
+.train-wagon::before,
+.train-wagon::after {
+    content: '';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: #212121;
+    border-radius: 50%;
+    bottom: -8px;
+}
+
+.train-wagon::before {
+    left: 26px;
+}
+
+.train-wagon::after {
+    right: 26px;
+}
+
+.train-wagon-2 {
+    left: 374px;
+    background: linear-gradient(to bottom, #4CAF50, #1B5E20);
+}
+
+.train-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 15%;
+    gap: 10px;
+}
+
+.train-btn {
+    border: none;
+    background: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 30px;
+    transition: all 0.3s;
+    min-width: 80px;
+}
+
+/* Botão Esquerda */
+.train-btn-left {
+    color: var(--bg2);
+}
+
+.train-btn-left:hover {
+    color: var(--bg5);
+}
+
+/* Botão Parar */
+.train-btn-stop {
+    color: var(--bg3);
+    font-size: 40px;
+}
+
+.train-btn-stop:hover {
+    color: var(--bg5);
+}
+
+/* Botão Direita */
+.train-btn-right {
+    color: var(--bg2);
+}
+
+.train-btn-right:hover {
+    color: var(--bg5);
+}
+
+/* Estados da animação */
+.train-rail.stopped,
+.train-sleepers.stopped {
+    animation-play-state: paused;
+}
+
+.train-rail.slow {
+    animation-duration: 3s;
+}
+
+.train-sleepers.slow {
+    animation-duration: 1.5s;
+}
+
+.train-rail.fast {
+    animation-duration: 1s;
+}
+
+.train-sleepers.fast {
+    animation-duration: 0.5s;
+}
+
+.train-rail.reverse {
+    animation-direction: reverse;
+}
+
+.train-sleepers.reverse {
+    animation-direction: reverse;
+}
+
+@keyframes train-move-rail {
+    0% {
+        background-position: 0 0;
+    }
+
+    100% {
+        background-position: 60px 0;
+    }
+}
+
+@keyframes train-move-sleepers {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-35px);
+    }
+}
+
+@keyframes train-smoke {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-80px) scale(2.5);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 991px) {
+    .train-container {
+        width: 100%;
+        bottom: 25px;
+    }
+
+    .train-chimney {
+        width: 30px;
+        height: 40px;
+        top: -40px;
+        left: 29px;
+    }
+
+    .train-locomotive {
+        width: 150px;
+        left: 38px;
+        top: -30px;
+    }
+
+    .train-locomotive::before {
+        width: 54px;
+        height: 54px;
+        top: -30px;
+        left: 17px;
+    }
+
+    .train-locomotive::after {
+        width: 44px;
+        height: 44px;
+        top: 20px;
+        right: 26px;
+    }
+
+    .train-wagon {
+        width: 104px;
+        top: -20px;
+        left: 205px;
+    }
+
+    .train-wagon::before {
+        left: 16px;
+    }
+
+    .train-wagon::after {
+        right: 16px;
+    }
+
+    .train-wagon-2 {
+        left: 328px;
+    }
+
+    .train {
+        height: 90px;
+    }
+
+    .train-btn {
+        min-width: 70px;
+    }
+}
+
+@media (max-width: 767px) {
+    .train-container {
+        width: 100%;
+    }
+
+    .train-chimney {
+        left: 29px;
+    }
+
+    .train-locomotive {
+        left: 25px;
+    }
+
+    .train-wagon {
+        left: 185px;
+    }
+
+    .train-wagon-2 {
+        display: none;
+    }
+}

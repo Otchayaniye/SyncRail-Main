@@ -28,7 +28,7 @@ if (isset($_SESSION["user_name"]) && isset($_SESSION["conected"])) {
     <title>Cadastro</title>
 </head>
 
-<body class="backgroundf">
+<body class="bg1">
     <div class="container d-flex justify-content-center align-items-center min-vh-100">
         <div class="d-flex flex-column align-items-center gap-3 p-4 rounded shadow bgform">
             <h2 class="">Cadastro</h2>

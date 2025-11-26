@@ -7,10 +7,15 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 
-$host = "localhost";
-$usuario = "root";
-$senha = "root";
-$banco = "tsf";
+// $host = "localhost";
+// $usuario = "root";
+// $senha = "root";
+// $banco = "tsf";
+
+$host     = "localhost:3307";
+$usuario  = "root";
+$senha    = "";
+$banco    = "tsf";
 
 // Criar conexão MySQLi
 $mysqli = new mysqli($host, $usuario, $senha, $banco);
