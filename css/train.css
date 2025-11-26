@@ -183,6 +183,7 @@
     border-radius: 6px;
     left: 224px;
     top: 10px;
+    z-index: 2;
 }
 
 .train-wagon::before,
@@ -207,6 +208,7 @@
 .train-wagon-2 {
     left: 374px;
     background: linear-gradient(to bottom, #4CAF50, #1B5E20);
+    z-index: 2;
 }
 
 .train-controls {
@@ -255,18 +257,9 @@
     color: var(--bg5);
 }
 
-/* Estados da animação */
 .train-rail.stopped,
 .train-sleepers.stopped {
     animation-play-state: paused;
-}
-
-.train-rail.slow {
-    animation-duration: 3s;
-}
-
-.train-sleepers.slow {
-    animation-duration: 1.5s;
 }
 
 .train-rail.fast {

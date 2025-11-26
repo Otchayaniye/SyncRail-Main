@@ -49,22 +49,19 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
 <body class="bg2 min-vh-100 d-flex flex-column justify-content-center">
     <div class="container d-flex justify-content-evenly align-items-stretch bgcont rounded p-0 gap-4">
         <div class="lbox d-flex flex-column gap-4">
-            <div class="w-100 bg4 h-100 rounded p-2">
+            <div class="w-100 bg4 rounded p-2 metcima">
                 <div class="bg6 w-100 h-100 rounded">
                     <div class="train-content">
                         <div class="train-scene rounded">
                             <div class="train-background"></div>
                             <div class="train-mountains"></div>
 
-                            <!-- PRIMEIRO: Trilhos (fundo) -->
                             <div class="train-track">
                                 <div class="train-rail"></div>
                                 <div class="train-sleepers">
-                                    <!-- Os dormentes serão adicionados via JavaScript -->
                                 </div>
                             </div>
 
-                            <!-- DEPOIS: Trem (sobre os trilhos) -->
                             <div class="train-container">
                                 <div class="train">
                                     <div class="train-locomotive">
@@ -95,17 +92,21 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
             </div>
 
 
-            <div class="w-100 h-100 d-flex gap-4">
+            <div class="w-100 d-flex gap-4 metbaixo">
                 <div class="w-100 bg3 h-100 rounded p-2 text-center">
-                    <div class="bg6 w-100 h-100 rounded pe-4 ps-4">
-                        <!-- <canvas id="temperaturaGauge"></canvas> -->
-                        <h5>Umidade</h5>
+                    <div class="bg6 w-100 h-100 rounded pe-4 ps-4 gaugebox">
+                        <div class=" w-100 h-100 gaugebox">
+                            <canvas id="umidadeGauge" class="gauge"></canvas>
+                        <h5 class="titgauge">Umidade</h5>
+                        </div>
                     </div>
                 </div>
                 <div class="w-100 bg1 h-100 rounded p-2 text-center">
-                    <div class="bg6 w-100 h-100 rounded pe-4 ps-4">
-                        <!-- <canvas id="temperaturaGauge"></canvas> -->
-                        <h5>Temperatura</h5>
+                    <div class="bg6 w-100 h-100 rounded pe-4 ps-4 gaugebox">
+                        <div class=" w-100 h-100 gaugebox">
+                            <canvas id="temperaturaGauge" class="gauge"></canvas>
+                        <h5 class="titgauge">Temperatura</h5>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -360,10 +361,32 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                 });
             });
 
-            var temperatura = 0;
 
-            const ctx = document.getElementById('temperaturaGauge').getContext('2d');
-            const gauge = new Chart(ctx, {
+            let temperatura = 0;
+            let umidade = 0;
+            let iluminacao = "";
+            let presenca = "";
+            let velocidade = 0;
+
+            $.ajax({
+                url: 'get_messages.php',
+                type: 'POST',
+                success: function (response) {
+                    if (response.success) {
+                        temperatura = parseInt(response.temperatura);
+                        umidade = parseInt(response.umidade);
+                        iluminacao = response.iluminacao;
+                        presenca = response.presenca;
+                        velocidade = parseInt(response.velocidade);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Erro AJAX:', error);
+                }
+            });
+
+            const ctxtemp = document.getElementById('temperaturaGauge').getContext('2d');
+            const gaugetemp = new Chart(ctxtemp, {
                 type: 'doughnut',
                 data: {
                     datasets: [{
@@ -387,24 +410,43 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
             });
 
             function getCorTemperatura(temp) {
-                if (temp < 20) return '#3498db';
-                if (temp < 30) return '#f39c12';
-                return '#e74c3c';
+                if (temp < 20) return '#4da3ff';
+                if (temp < 30) return '#ff884d';
+                return '#ff4d4d';
             }
 
-            function set_Temperature() {
+            const ctxumi = document.getElementById('umidadeGauge').getContext('2d');
+            const gaugeumi = new Chart(ctxumi, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [umidade, 100 - umidade],
+                        backgroundColor: [
+                            getCorUmidade(umidade),
+                            '#f0f0f0'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    circumference: 270,
+                    rotation: 225,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
 
-                fetch('get_messages.php')
-                    .then(r => r.text())
-                    .then(data => {
-                        console.log("Recebido:", data);
-                        if (data.trim() != "") {
-                            temperatura.textContent = data.trim();
-                        }
-                    })
-                    .catch(err => console.error(err));
+            function getCorUmidade(umi) {
+                if (umi < 30) return '#ff4d4d';
+                if (umi < 40) return '#ffa64d';
+                if (umi < 50) return '#ffea4d';
+                if (umi < 60) return '#7cff4d';
+                if (umi < 70) return '#4d77ff';
+                return '#b24dff';
             }
-            setInterval(set_Temperature, 1000);
 
         </script>
 </body>

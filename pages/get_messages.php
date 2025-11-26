@@ -2,7 +2,7 @@
 require("phpMQTT.php");
 
 $server = "hivemq.com";
-$port = 8883;
+$port = 1883;
 $t_iluminacao = "SyncRail/S1/Iluminacao";
 $t_temperatura = "SyncRail/S1/Temperatura";
 $t_umidade = "SyncRail/S1/Umidade";
@@ -10,10 +10,15 @@ $t_presenca = "SyncRail/S1/Presenca";
 $t_velocidade = "SyncRail/S4/Velocidade";
 $client_id = "phpmqtt-" . rand();
 
-$username = "";
-$password = "";
+$username = "SyncRail";
+$password = "SyncRail123";
 $cafile = __DIR__ . "/cacert.pem";
-$message = "";
+
+$m_iluminacao = "";
+$m_temperatura = "";
+$m_umidade = "";
+$m_presenca = "";
+$m_velocidade = "";
 
 
 
@@ -27,51 +32,71 @@ if (!$mqtt->connect(true, NULL, $username, $password)) {
 $mqtt->subscribe([
     $t_iluminacao => [
         "qos" => 0,
-        "function" => function ($topic, $msg) use (&$message) {
+        "function" => function ($t_iluminacao, $msg) use (&$m_iluminacao) {
             if (!empty($msg)) {
-                $message = $msg;
+                $m_iluminacao = $msg;
             }
         }
     ],
     $t_temperatura => [
         "qos" => 0,
-        "function" => function ($topic, $msg) use (&$message) {
+        "function" => function ($t_temperatura, $msg) use (&$m_temperatura) {
             if (!empty($msg)) {
-                $message = $msg;
+                $m_temperatura = $msg;
             }
         }
     ],
     $t_umidade => [
         "qos" => 0,
-        "function" => function ($topic, $msg) use (&$message) {
+        "function" => function ($t_umidade, $msg) use (&$m_umidade) {
             if (!empty($msg)) {
-                $message = $msg;
+                $m_umidade = $msg;
             }
         }
     ],
     $t_presenca => [
         "qos" => 0,
-        "function" => function ($topic, $msg) use (&$message) {
+        "function" => function ($t_presenca, $msg) use (&$m_presenca) {
             if (!empty($msg)) {
-                $message = $msg;
+                $m_presenca = $msg;
             }
         }
     ],
     $t_velocidade => [
         "qos" => 0,
-        "function" => function ($topic, $msg) use (&$message) {
+        "function" => function ($t_velocidade, $msg) use (&$m_velocidade) {
             if (!empty($msg)) {
-                $message = $msg;
+                $m_velocidade = $msg;
             }
         }
     ]
 ], 0);
 
+echo json_encode([
+    'success' => true,
+    'iluminacao' => $m_iluminacao,
+    'temperatura' => $m_temperatura,
+    'umidade' => $m_umidade,
+    'presenca' => $m_presenca,
+    'velocidade' => $m_velocidade
+]);
+
 $start = time();
-while (time() - $start < 2) {
+while (time() - $start < 5) {
     $mqtt->proc();
 }
 
 $mqtt->close();
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
 
-echo $message;
