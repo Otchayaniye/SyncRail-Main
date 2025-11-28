@@ -75,7 +75,8 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                                 </div>
                             </div>
                         </div>
-                        <div class="w-100 h-100" id="adminonly" data-is-admin="<?= htmlspecialchars($_SESSION['admin']) ?>">
+                        <div class="w-100 h-100" id="adminonly"
+                            data-is-admin="<?= htmlspecialchars($_SESSION['admin']) ?>">
                             <div class="train-controls">
                                 <button class="train-btn" id="goLeft">
                                     <i class="bi bi-caret-left-fill train-btn-left"></i>
@@ -429,60 +430,79 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                 }
             });
 
-            function updateDashboard() {
-                $.ajax({
-                    url: 'get_messages.php',
-                    type: 'POST',
-                    dataType: 'json',
-                    timeout: 15000, 
-                    success: function (response) {
-                        if (response.success) {
-                            const temperatura = parseInt(response.temperatura) || 0;
-                            const umidade = parseInt(response.umidade) || 0;
-                            const iluminacao = response.iluminacao || 'N/A';
-                            const presenca = response.presenca || 'N/A';
-                            const velocidade = parseInt(response.velocidade) || 0;
-
-                            console.log('Dados recebidos:', {
-                                temperatura,
-                                umidade,
-                                iluminacao,
-                                presenca,
-                                velocidade
-                            });
-
-                            // Update gauges
-                            if (gaugetemp && gaugeumi) {
-                                gaugetemp.data.datasets[0].data = [temperatura, 50 - temperatura];
-                                gaugetemp.data.datasets[0].backgroundColor = [getCorTemperatura(temperatura), '#f0f0f0'];
-                                gaugetemp.update();
-
-                                gaugeumi.data.datasets[0].data = [umidade, 100 - umidade];
-                                gaugeumi.data.datasets[0].backgroundColor = [getCorUmidade(umidade), '#f0f0f0'];
-                                gaugeumi.update();
-                            }
-
-                            // Update text values
-                            document.getElementById('iluminacaoValue').textContent = iluminacao;
-                            document.getElementById('presencaValue').textContent = presenca;
-                            document.getElementById('velocidadeValue').textContent = velocidade;
-                        } else {
-                            console.error('Erro na resposta:', response.error);
-                            document.getElementById('iluminacaoValue').textContent = 'Erro';
-                            document.getElementById('presencaValue').textContent = 'Erro';
-                            document.getElementById('velocidadeValue').textContent = 'Erro';
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Erro AJAX:', status, error);
-                        document.getElementById('iluminacaoValue').textContent = 'Erro';
-                        document.getElementById('presencaValue').textContent = 'Erro';
-                        document.getElementById('velocidadeValue').textContent = 'Erro';
-                    }
-                });
+            // Função para atualizar o gauge da temperatura
+            function atualizarGaugeTemperatura(temp) {
+                if (gaugetemp) {
+                    // Atualiza os dados do gráfico
+                    gaugetemp.data.datasets[0].data = [temp, 50 - temp];
+                    // Atualiza a cor baseada na temperatura
+                    gaugetemp.data.datasets[0].backgroundColor[0] = getCorTemperatura(temp);
+                    // Atualiza o gráfico
+                    gaugetemp.update('none');
+                    console.log("Gauge temperatura atualizado para:", temp);
+                }
             }
-            setInterval(updateDashboard, 10000);
 
+            // Função para atualizar o gauge da umidade (caso precise no futuro)
+            function atualizarGaugeUmidade(umi) {
+                if (gaugeumi) {
+                    gaugeumi.data.datasets[0].data = [umi, 100 - umi];
+                    gaugeumi.data.datasets[0].backgroundColor[0] = getCorUmidade(umi);
+                    gaugeumi.update('none');
+                    console.log("Gauge umidade atualizado para:", umi);
+                }
+            }
+
+            function set_sensordata() {
+                fetch('get_messages.php')
+                    .then(r => r.json())
+                    .then(data => {
+                        console.log("Mensagens recebidas:", data);
+                        for (let topic in data) {
+                            let message = data[topic];
+                            console.log(message);
+
+                            if (topic === 'SyncRail/S1/Temperatura') {
+                                if (message !== null && message !== undefined && message !== '') {
+                                    const temperatura = parseFloat(message);
+                                    console.log("Temperatura recebida:", temperatura);
+                                    atualizarGaugeTemperatura(temperatura);
+                                    salvarDadosSensor(temperatura, 'temperature', topic);
+                                    console.log("Valor de temperatura inválido:", message);
+                                }
+                            }
+                        }
+                    })
+                    .catch(err => console.error("Erro ao buscar dados:", err));
+            }
+            setInterval(set_sensordata, 1000);
+            // Função para salvar dados do sensor no banco
+            function salvarDadosSensor(valor, tipo, topico) {
+                const dados = {
+                    sensor_value: valor,
+                    sensor_type: tipo,
+                    sensor_topic: topico
+                };
+
+                fetch('../connections/save_sensor_data.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(dados)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log(`Dados do sensor ${tipo} salvos com sucesso:`, valor);
+                        } else {
+                            console.error(`Erro ao salvar dados do sensor ${tipo}:`, data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro na requisição:', error);
+                    });
+            }
         </script>
 </body>
 

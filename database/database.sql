@@ -98,3 +98,19 @@ CREATE TABLE chamados (
     data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES usuario(pk_user) ON DELETE CASCADE
 );
+
+CREATE TABLE sensordata (
+    pk_sensor_data INT AUTO_INCREMENT PRIMARY KEY,
+    sensor_value DECIMAL(10,2) NOT NULL,
+    sensor_type VARCHAR(50) NOT NULL,
+    sensor_topic VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- CREATE TABLE sensor (
+--     pk_sensor_data INT AUTO_INCREMENT PRIMARY KEY,
+--     sensor_value DECIMAL(10,2) NOT NULL,
+--     sensor_type VARCHAR(50) NOT NULL,
+--     sensor_topic VARCHAR(100),
+--     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );
