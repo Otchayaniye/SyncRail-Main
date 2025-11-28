@@ -2,7 +2,7 @@
 require("phpMQTT.php");
 
 $server = "hivemq.com";
-$port = 1883;
+$port = 8883;
 $t_iluminacao = "SyncRail/S1/Iluminacao";
 $t_temperatura = "SyncRail/S1/Temperatura";
 $t_umidade = "SyncRail/S1/Umidade";
@@ -88,15 +88,4 @@ while (time() - $start < 5) {
 
 $mqtt->close();
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
 

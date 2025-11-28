@@ -52,7 +52,7 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
             <div class="w-100 bg4 rounded p-2 metcima">
                 <div class="bg6 w-100 h-100 rounded">
                     <div class="train-content">
-                        <div class="train-scene rounded">
+                        <div class="train-scene rounded overlaydark">
                             <div class="train-background"></div>
                             <div class="train-mountains"></div>
 
@@ -75,17 +75,18 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                                 </div>
                             </div>
                         </div>
-
-                        <div class="train-controls">
-                            <button class="train-btn" id="goLeft">
-                                <i class="bi bi-caret-left-fill train-btn-left"></i>
-                            </button>
-                            <button class="train-btn" id="stop">
-                                <i class="bi bi-pause-fill train-btn-stop"></i>
-                            </button>
-                            <button class="train-btn" id="goRight">
-                                <i class="bi bi-caret-right-fill train-btn-right"></i>
-                            </button>
+                        <div class="w-100 h-100" id="adminonly" data-is-admin="<?= htmlspecialchars($_SESSION['admin']) ?>">
+                            <div class="train-controls">
+                                <button class="train-btn" id="goLeft">
+                                    <i class="bi bi-caret-left-fill train-btn-left"></i>
+                                </button>
+                                <button class="train-btn" id="stop">
+                                    <i class="bi bi-pause-fill train-btn-stop"></i>
+                                </button>
+                                <button class="train-btn" id="goRight">
+                                    <i class="bi bi-caret-right-fill train-btn-right"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -97,7 +98,7 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                     <div class="bg6 w-100 h-100 rounded pe-4 ps-4 gaugebox">
                         <div class=" w-100 h-100 gaugebox">
                             <canvas id="umidadeGauge" class="gauge"></canvas>
-                        <h5 class="titgauge">Umidade</h5>
+                            <h5 class="titgauge">Umidade</h5>
                         </div>
                     </div>
                 </div>
@@ -105,7 +106,7 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                     <div class="bg6 w-100 h-100 rounded pe-4 ps-4 gaugebox">
                         <div class=" w-100 h-100 gaugebox">
                             <canvas id="temperaturaGauge" class="gauge"></canvas>
-                        <h5 class="titgauge">Temperatura</h5>
+                            <h5 class="titgauge">Temperatura</h5>
                         </div>
                     </div>
                 </div>
@@ -362,82 +363,13 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
             });
 
 
-            let temperatura = 0;
-            let umidade = 0;
-            let iluminacao = "";
-            let presenca = "";
-            let velocidade = 0;
-
-            $.ajax({
-                url: 'get_messages.php',
-                type: 'POST',
-                success: function (response) {
-                    if (response.success) {
-                        temperatura = parseInt(response.temperatura);
-                        umidade = parseInt(response.umidade);
-                        iluminacao = response.iluminacao;
-                        presenca = response.presenca;
-                        velocidade = parseInt(response.velocidade);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Erro AJAX:', error);
-                }
-            });
-
-            const ctxtemp = document.getElementById('temperaturaGauge').getContext('2d');
-            const gaugetemp = new Chart(ctxtemp, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [temperatura, 50 - temperatura],
-                        backgroundColor: [
-                            getCorTemperatura(temperatura),
-                            '#f0f0f0'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    circumference: 270,
-                    rotation: 225,
-                    cutout: '80%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
-                }
-            });
+            let gaugetemp, gaugeumi;
 
             function getCorTemperatura(temp) {
                 if (temp < 20) return '#4da3ff';
                 if (temp < 30) return '#ff884d';
                 return '#ff4d4d';
             }
-
-            const ctxumi = document.getElementById('umidadeGauge').getContext('2d');
-            const gaugeumi = new Chart(ctxumi, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [umidade, 100 - umidade],
-                        backgroundColor: [
-                            getCorUmidade(umidade),
-                            '#f0f0f0'
-                        ],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    circumference: 270,
-                    rotation: 225,
-                    cutout: '80%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
-                }
-            });
 
             function getCorUmidade(umi) {
                 if (umi < 30) return '#ff4d4d';
@@ -447,6 +379,109 @@ $_SESSION['admin'] = (int) $admin['user_adm'];
                 if (umi < 70) return '#4d77ff';
                 return '#b24dff';
             }
+
+            // Initialize gauges with 0
+            const ctxtemp = document.getElementById('temperaturaGauge').getContext('2d');
+            gaugetemp = new Chart(ctxtemp, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [0, 50],
+                        backgroundColor: [
+                            getCorTemperatura(0),
+                            '#f0f0f0'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    circumference: 270,
+                    rotation: 225,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+
+            const ctxumi = document.getElementById('umidadeGauge').getContext('2d');
+            gaugeumi = new Chart(ctxumi, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: [
+                            getCorUmidade(0),
+                            '#f0f0f0'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    circumference: 270,
+                    rotation: 225,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+                }
+            });
+
+            function updateDashboard() {
+                $.ajax({
+                    url: 'get_messages.php',
+                    type: 'POST',
+                    dataType: 'json',
+                    timeout: 15000, 
+                    success: function (response) {
+                        if (response.success) {
+                            const temperatura = parseInt(response.temperatura) || 0;
+                            const umidade = parseInt(response.umidade) || 0;
+                            const iluminacao = response.iluminacao || 'N/A';
+                            const presenca = response.presenca || 'N/A';
+                            const velocidade = parseInt(response.velocidade) || 0;
+
+                            console.log('Dados recebidos:', {
+                                temperatura,
+                                umidade,
+                                iluminacao,
+                                presenca,
+                                velocidade
+                            });
+
+                            // Update gauges
+                            if (gaugetemp && gaugeumi) {
+                                gaugetemp.data.datasets[0].data = [temperatura, 50 - temperatura];
+                                gaugetemp.data.datasets[0].backgroundColor = [getCorTemperatura(temperatura), '#f0f0f0'];
+                                gaugetemp.update();
+
+                                gaugeumi.data.datasets[0].data = [umidade, 100 - umidade];
+                                gaugeumi.data.datasets[0].backgroundColor = [getCorUmidade(umidade), '#f0f0f0'];
+                                gaugeumi.update();
+                            }
+
+                            // Update text values
+                            document.getElementById('iluminacaoValue').textContent = iluminacao;
+                            document.getElementById('presencaValue').textContent = presenca;
+                            document.getElementById('velocidadeValue').textContent = velocidade;
+                        } else {
+                            console.error('Erro na resposta:', response.error);
+                            document.getElementById('iluminacaoValue').textContent = 'Erro';
+                            document.getElementById('presencaValue').textContent = 'Erro';
+                            document.getElementById('velocidadeValue').textContent = 'Erro';
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Erro AJAX:', status, error);
+                        document.getElementById('iluminacaoValue').textContent = 'Erro';
+                        document.getElementById('presencaValue').textContent = 'Erro';
+                        document.getElementById('velocidadeValue').textContent = 'Erro';
+                    }
+                });
+            }
+            setInterval(updateDashboard, 10000);
 
         </script>
 </body>
